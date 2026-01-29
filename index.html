@@ -139,10 +139,10 @@
 <body>
 
 <div class="container">
-    <h1>Smart Berg Balance Scale</h1>
+    <h1>Berg Balance Scale</h1>
     
     <div class="instructions">
-        <strong>Note:</strong> This form is smart. If you mark "Unable" on Sitting or Standing, it will automatically score "0" for subsequent dependent items.
+        <strong>Note:</strong> If you mark "Unable" on Sitting or Standing, it will automatically score "0" for subsequent dependent items.
     </div>
 
     <form id="bbsForm">
@@ -423,7 +423,7 @@
         let risk = "";
         let level = "";
 
-        if (score >= 41) {
+        if (score >= 45) {
             risk = "Low Fall Risk";
             level = "Patient is likely independent.";
             resultDiv.style.borderColor = "#059669";
