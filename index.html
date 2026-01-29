@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Berg Balance Scale (BBS)</title>
+    <style>
+        :root {
+            --primary: #059669;
+            --disabled: #9ca3af;
+            --bg: #f0fdf4;
+            --card: #ffffff;
+            --text: #1f2937;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 1rem;
+        }
+
+        .instructions {
+            background-color: #d1fae5;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Logic specific styles */
+        .question-block {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            transition: opacity 0.3s ease, background-color 0.3s;
+        }
+
+        .question-block.disabled-block {
+            opacity: 0.5;
+            pointer-events: none; /* Prevents clicking */
+            background-color: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .question-title {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .options label {
+            display: flex;
+            padding: 6px 0;
+            cursor: pointer;
+            align-items: flex-start;
+        }
+
+        .options label:hover {
+            color: var(--primary);
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+            margin-top: 5px;
+            transform: scale(1.2);
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 2rem;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #047857;
+        }
+
+        .result-section {
+            margin-top: 2rem;
+            padding: 2rem;
+            background-color: #ecfdf5;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .hidden { display: none; }
+        
+        .auto-msg {
+            font-size: 0.85rem;
+            color: #dc2626;
+            font-weight: bold;
+            margin-left: 10px;
+            display: none;
+        }
+        
+        .disabled-block .auto-msg {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Smart Berg Balance Scale</h1>
+    
+    <div class="instructions">
+        <strong>Note:</strong> This form is smart. If you mark "Unable" on Sitting or Standing, it will automatically score "0" for subsequent dependent items.
+    </div>
+
+    <form id="bbsForm">
+        
+        <!-- ITEM 1 -->
+        <div class="question-block" id="block-q1">
+            <span class="question-title">1. Sitting to Standing</span>
+            <div class="options">
+                <label><input type="radio" name="q1" value="4"> 4: Able to stand without using hands and stabilize independently</label>
+                <label><input type="radio" name="q1" value="3"> 3: Able to stand independently using hands</label>
+                <label><input type="radio" name="q1" value="2"> 2: Able to stand using hands after several tries</label>
+                <label><input type="radio" name="q1" value="1"> 1: Needs minimal aid to stand or stabilize</label>
+                <label><input type="radio" name="q1" value="0"> 0: Needs moderate or maximal assist to stand</label>
+            </div>
+        </div>
+
+        <!-- ITEM 2 (CRITICAL LOGIC ITEM) -->
+        <div class="question-block" id="block-q2">
+            <span class="question-title">2. Standing Unsupported <span class="auto-msg">(Auto-zeroed due to sitting inability)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q2" value="4"> 4: Able to stand safely for 2 minutes</label>
+                <label><input type="radio" name="q2" value="3"> 3: Able to stand 2 minutes with supervision</label>
+                <label><input type="radio" name="q2" value="2"> 2: Able to stand 30 seconds unsupported</label>
+                <label><input type="radio" name="q2" value="1"> 1: Needs several tries to stand 30 seconds unsupported</label>
+                <label><input type="radio" name="q2" value="0"> 0: Unable to stand 30 seconds unsupported</label>
+            </div>
+        </div>
+
+        <!-- ITEM 3 (CRITICAL LOGIC ITEM) -->
+        <div class="question-block" id="block-q3">
+            <span class="question-title">3. Sitting with Back Unsupported</span>
+            <div class="options">
+                <label><input type="radio" name="q3" value="4"> 4: Able to sit safely and securely for 2 minutes</label>
+                <label><input type="radio" name="q3" value="3"> 3: Able to sit 2 minutes under supervision</label>
+                <label><input type="radio" name="q3" value="2"> 2: Able to sit 30 seconds</label>
+                <label><input type="radio" name="q3" value="1"> 1: Able to sit 10 seconds</label>
+                <label><input type="radio" name="q3" value="0"> 0: Unable to sit without support 10 seconds</label>
+            </div>
+        </div>
+
+        <!-- ITEM 4 -->
+        <div class="question-block" id="block-q4">
+            <span class="question-title">4. Standing to Sitting <span class="auto-msg">(Auto-zeroed)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q4" value="4"> 4: Sits safely with minimal use of hands</label>
+                <label><input type="radio" name="q4" value="3"> 3: Controls descent by using hands</label>
+                <label><input type="radio" name="q4" value="2"> 2: Uses back of legs against chair to control descent</label>
+                <label><input type="radio" name="q4" value="1"> 1: Sits independently but has uncontrolled descent</label>
+                <label><input type="radio" name="q4" value="0"> 0: Needs assist to sit</label>
+            </div>
+        </div>
+
+        <!-- ITEM 5 -->
+        <div class="question-block" id="block-q5">
+            <span class="question-title">5. Transfers <span class="auto-msg">(Auto-zeroed)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q5" value="4"> 4: Able to transfer safely with minor use of hands</label>
+                <label><input type="radio" name="q5" value="3"> 3: Able to transfer safely with definite need of hands</label>
+                <label><input type="radio" name="q5" value="2"> 2: Able to transfer with verbal cueing and/or supervision</label>
+                <label><input type="radio" name="q5" value="1"> 1: Needs one person to assist</label>
+                <label><input type="radio" name="q5" value="0"> 0: Needs two people to assist or supervise</label>
+            </div>
+        </div>
+
+        <!-- ITEM 6 -->
+        <div class="question-block" id="block-q6">
+            <span class="question-title">6. Standing Unsupported with Eyes Closed <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q6" value="4"> 4: Able to stand 10 seconds safely</label>
+                <label><input type="radio" name="q6" value="3"> 3: Able to stand 10 seconds with supervision</label>
+                <label><input type="radio" name="q6" value="2"> 2: Able to stand 3 seconds</label>
+                <label><input type="radio" name="q6" value="1"> 1: Unable to keep eyes closed 3 seconds but stays steady</label>
+                <label><input type="radio" name="q6" value="0"> 0: Needs help to keep from falling</label>
+            </div>
+        </div>
+
+        <!-- ITEM 7 -->
+        <div class="question-block" id="block-q7">
+            <span class="question-title">7. Standing Unsupported with Feet Together <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q7" value="4"> 4: Able to place feet together independently and stand 1 minute safe</label>
+                <label><input type="radio" name="q7" value="3"> 3: Able to place feet together independently and stand 1 minute with supervision</label>
+                <label><input type="radio" name="q7" value="2"> 2: Able to place feet together independently but unable to hold for 30 seconds</label>
+                <label><input type="radio" name="q7" value="1"> 1: Needs help to attain position but able to stand 15 seconds with feet together</label>
+                <label><input type="radio" name="q7" value="0"> 0: Needs help to attain position and unable to hold for 15 seconds</label>
+            </div>
+        </div>
+
+        <!-- ITEM 8 -->
+        <div class="question-block" id="block-q8">
+            <span class="question-title">8. Reaching Forward with Outstretched Arm <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q8" value="4"> 4: Can reach forward confidently >25 cm</label>
+                <label><input type="radio" name="q8" value="3"> 3: Can reach forward >12 cm</label>
+                <label><input type="radio" name="q8" value="2"> 2: Can reach forward >5 cm</label>
+                <label><input type="radio" name="q8" value="1"> 1: Reaches forward but needs supervision</label>
+                <label><input type="radio" name="q8" value="0"> 0: Loses balance while trying/requires external support</label>
+            </div>
+        </div>
+
+        <!-- ITEM 9 -->
+        <div class="question-block" id="block-q9">
+            <span class="question-title">9. Pick Up Object from the Floor <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q9" value="4"> 4: Able to pick up object safely and easily</label>
+                <label><input type="radio" name="q9" value="3"> 3: Able to pick up object but needs supervision</label>
+                <label><input type="radio" name="q9" value="2"> 2: Unable to pick up but reaches 2-5cm and keeps balance</label>
+                <label><input type="radio" name="q9" value="1"> 1: Unable to pick up and needs supervision while trying</label>
+                <label><input type="radio" name="q9" value="0"> 0: Unable to try/needs assist to keep from losing balance/falls</label>
+            </div>
+        </div>
+
+        <!-- ITEM 10 -->
+        <div class="question-block" id="block-q10">
+            <span class="question-title">10. Turning to Look Behind <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q10" value="4"> 4: Looks behind from both sides and weight shifts well</label>
+                <label><input type="radio" name="q10" value="3"> 3: Looks behind one side only</label>
+                <label><input type="radio" name="q10" value="2"> 2: Turns sideways only but maintains balance</label>
+                <label><input type="radio" name="q10" value="1"> 1: Needs supervision when turning</label>
+                <label><input type="radio" name="q10" value="0"> 0: Needs assist to keep from losing balance or falls</label>
+            </div>
+        </div>
+
+        <!-- ITEM 11 -->
+        <div class="question-block" id="block-q11">
+            <span class="question-title">11. Turn 360 Degrees <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q11" value="4"> 4: Able to turn 360 degrees safely in 4 seconds or less</label>
+                <label><input type="radio" name="q11" value="3"> 3: Able to turn 360 degrees safely one side only</label>
+                <label><input type="radio" name="q11" value="2"> 2: Able to turn 360 degrees safely but slowly</label>
+                <label><input type="radio" name="q11" value="1"> 1: Needs close supervision or verbal cueing</label>
+                <label><input type="radio" name="q11" value="0"> 0: Needs assistance while turning</label>
+            </div>
+        </div>
+
+        <!-- ITEM 12 -->
+        <div class="question-block" id="block-q12">
+            <span class="question-title">12. Placing Alternate Foot on Stool <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q12" value="4"> 4: Able to stand independently and complete 8 steps in 20 sec</label>
+                <label><input type="radio" name="q12" value="3"> 3: Able to stand independently and complete 8 steps in >20 sec</label>
+                <label><input type="radio" name="q12" value="2"> 2: Able to complete 4 steps without aid with supervision</label>
+                <label><input type="radio" name="q12" value="1"> 1: Able to complete >2 steps needs minimal assist</label>
+                <label><input type="radio" name="q12" value="0"> 0: Needs assistance to keep from falling/unable to try</label>
+            </div>
+        </div>
+
+        <!-- ITEM 13 -->
+        <div class="question-block" id="block-q13">
+            <span class="question-title">13. Standing One Foot in Front <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q13" value="4"> 4: Able to place foot tandem independently and hold 30s</label>
+                <label><input type="radio" name="q13" value="3"> 3: Able to place foot ahead independently and hold 30s</label>
+                <label><input type="radio" name="q13" value="2"> 2: Able to take small step independently and hold 30s</label>
+                <label><input type="radio" name="q13" value="1"> 1: Needs help to step but can hold 15s</label>
+                <label><input type="radio" name="q13" value="0"> 0: Loses balance while stepping or standing</label>
+            </div>
+        </div>
+
+        <!-- ITEM 14 -->
+        <div class="question-block" id="block-q14">
+            <span class="question-title">14. Standing on One Leg <span class="auto-msg">(Auto-zeroed: Cannot stand)</span></span>
+            <div class="options">
+                <label><input type="radio" name="q14" value="4"> 4: Able to lift leg independently and hold >10s</label>
+                <label><input type="radio" name="q14" value="3"> 3: Able to lift leg independently and hold 5-10s</label>
+                <label><input type="radio" name="q14" value="2"> 2: Able to lift leg independently and hold = or > 3s</label>
+                <label><input type="radio" name="q14" value="1"> 1: Tries to lift leg, unable to hold 3s but remains standing</label>
+                <label><input type="radio" name="q14" value="0"> 0: Unable to try or needs assist to prevent fall</label>
+            </div>
+        </div>
+
+        <button type="button" onclick="calculateBBS()">Calculate BBS Score</button>
+    </form>
+
+    <div id="result" class="result-section hidden">
+        <h3>Total Score (Max 56)</h3>
+        <div id="scoreValue" class="score-display">0</div>
+        <p id="interpRisk" style="font-weight: bold; margin-top: 10px;"></p>
+        <p id="interpLevel" style="color: #4b5563; font-style: italic;"></p>
+    </div>
+</div>
+
+<script>
+    // AUTOMATIC LOGIC LISTENER
+    document.getElementById('bbsForm').addEventListener('change', function() {
+        checkDependencies();
+    });
+
+    function checkDependencies() {
+        // Get values of the Critical Items
+        const q2Radio = document.querySelector('input[name="q2"]:checked');
+        const q3Radio = document.querySelector('input[name="q3"]:checked');
+        
+        const q2Value = q2Radio ? parseInt(q2Radio.value) : -1;
+        const q3Value = q3Radio ? parseInt(q3Radio.value) : -1;
+
+        // RULE 1: If Q3 (Sitting) is 0 -> EVERYTHING else is 0
+        if (q3Value === 0) {
+            // Disable Q1, Q2, and Q4 through Q14
+            setQuestionState('q1', 0, true);
+            setQuestionState('q2', 0, true);
+            for(let i=4; i<=14; i++) {
+                setQuestionState('q'+i, 0, true);
+            }
+        } 
+        // RULE 2: If Q2 (Standing) is 0 -> Dynamic Standing (Q6-Q14) is 0
+        else if (q2Value === 0) {
+            // First, ensure Q1, Q4, Q5 are enabled (as they are possible even if standing unsupported is 0)
+            setQuestionState('q1', null, false); // Null means don't force a value
+            setQuestionState('q4', null, false);
+            setQuestionState('q5', null, false);
+            
+            // Disable Q6 through Q14
+            for(let i=6; i<=14; i++) {
+                setQuestionState('q'+i, 0, true);
+            }
+        } 
+        // RULE 3: If neither is 0, Enable everything
+        else {
+            for(let i=1; i<=14; i++) {
+                // We pass 'false' to enable, and 'null' to say "don't change the value"
+                setQuestionState('q'+i, null, false); 
+            }
+        }
+    }
+
+    // Helper to disable/enable blocks
+    function setQuestionState(qName, forceValue, isDisabled) {
+        const block = document.getElementById('block-' + qName);
+        const inputs = block.querySelectorAll('input[type="radio"]');
+
+        if (isDisabled) {
+            block.classList.add('disabled-block');
+            inputs.forEach(input => {
+                input.disabled = true;
+                if (input.value == forceValue) {
+                    input.checked = true;
+                }
+            });
+        } else {
+            // Only re-enable if it was previously disabled
+            if(block.classList.contains('disabled-block')) {
+                block.classList.remove('disabled-block');
+                inputs.forEach(input => {
+                    input.disabled = false;
+                    // Optional: Uncheck the auto-selected 0 if you want user to be forced to choose again
+                    // input.checked = false; 
+                });
+            }
+        }
+    }
+
+    function calculateBBS() {
+        const totalQuestions = 14;
+        let score = 0;
+        let answeredCount = 0;
+
+        for(let i = 1; i <= totalQuestions; i++) {
+            const selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if(selected) {
+                score += parseInt(selected.value);
+                answeredCount++;
+            }
+        }
+
+        // Even if disabled, the "0" is checked, so it counts as answered.
+        if (answeredCount < totalQuestions) {
+            alert(`Please answer all questions (or ensure auto-zeros are set). Answered: ${answeredCount}/14`);
+            return;
+        }
+
+        document.getElementById('scoreValue').textContent = score;
+        const resultDiv = document.getElementById('result');
+        const riskText = document.getElementById('interpRisk');
+        const levelText = document.getElementById('interpLevel');
+
+        let risk = "";
+        let level = "";
+
+        if (score >= 41) {
+            risk = "Low Fall Risk";
+            level = "Patient is likely independent.";
+            resultDiv.style.borderColor = "#059669";
+            document.getElementById('scoreValue').style.color = "#059669";
+        } else if (score >= 21) {
+            risk = "Medium Fall Risk";
+            level = "Patient may require walking assistance.";
+            resultDiv.style.borderColor = "#d97706";
+            document.getElementById('scoreValue').style.color = "#d97706";
+        } else {
+            risk = "High Fall Risk";
+            level = "Patient likely requires wheelchair or significant assistance.";
+            resultDiv.style.borderColor = "#dc2626";
+            document.getElementById('scoreValue').style.color = "#dc2626";
+        }
+
+        riskText.textContent = risk;
+        levelText.textContent = level;
+        resultDiv.classList.remove('hidden');
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
