@@ -3,144 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBS Calculator | Physiotherapy Department</title>
+    <title>BBS Clinical Calculator | HA PT Department</title>
     <style>
         :root {
-            --primary-blue: #005eb8; /* Clinical Blue */
-            --bg-gray: #f4f7f9;
-            --locked-gray: #e9ecef;
-            --text-dark: #333;
+            --ha-blue: #007b85; /* Professional Clinical Teal/Blue */
+            --bg-light: #f8f9fa;
+            --border-color: #dee2e6;
+            --locked-bg: #e9ecef;
+            --text-main: #212529;
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background-color: var(--bg-gray); color: var(--text-dark); margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: var(--primary-blue); border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px; margin-top: 0; }
-        .question-block { margin-bottom: 20px; padding: 15px; border-radius: 8px; border: 1px solid #ddd; transition: all 0.3s ease; }
-        .question-block.locked { background-color: var(--locked-gray); opacity: 0.7; pointer-events: none; border-color: #ccc; }
-        .question-title { font-weight: bold; margin-bottom: 10px; display: block; }
-        .options { display: flex; justify-content: space-between; gap: 5px; }
-        .option-item { flex: 1; text-align: center; }
-        .option-item input { margin-bottom: 5px; }
-        .score-display { position: sticky; top: 0; background: var(--primary-blue); color: white; padding: 15px; border-radius: 8px; text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 20px; z-index: 100; }
-        .button-group { display: flex; gap: 10px; margin-top: 30px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: opacity 0.2s; }
-        .btn-reset { background-color: #6c757d; color: white; }
-        .btn-home { background-color: #007bff; color: white; }
-        button:hover { opacity: 0.9; }
-        .clinical-note { font-size: 0.85rem; color: #666; font-style: italic; margin-top: 5px; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .calculator-card {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            background-color: var(--ha-blue);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 { margin: 0; font-size: 1.5rem; }
+        .header p { margin: 5px 0 0; font-size: 0.9rem; opacity: 0.9; }
+
+        .score-banner {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-bottom: 2px solid var(--ha-blue);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-container { padding: 20px; }
+
+        .question-block {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .question-block.locked {
+            background-color: var(--locked-bg);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .question-label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option {
+            text-align: center;
+            flex: 1;
+        }
+
+        .option input { cursor: pointer; }
+
+        .footer-btns {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: #f1f3f5;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-reset { background: #6c757d; color: white; }
+        .btn-home { background: var(--ha-blue); color: white; }
+        button:hover { filter: brightness(90%); }
+
+        .clinical-hint {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 5px;
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .options-row { flex-wrap: wrap; }
+            .option { min-width: 18%; margin-bottom: 10px; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="score-display">Total BBS Score: <span id="total-score">0</span> / 56</div>
-    
-    <h1>Berg Balance Scale</h1>
-    <p>Clinically optimized for ward administration.</p>
+<div class="calculator-card">
+    <div class="header">
+        <h1>Berg Balance Scale (BBS)</h1>
+        <p>Physiotherapy Department - Clinical Decision Support Tool</p>
+    </div>
 
-    <form id="bbs-form">
-        <div id="questions-container"></div>
+    <div class="score-banner">
+        Total Score: <span id="total-score">0</span> / 56
+    </div>
+
+    <form id="bbsForm" class="item-container">
+        <div id="questions-list"></div>
     </form>
 
-    <div class="button-group">
-        <button type="button" class="btn-reset" onclick="resetForm()">Reset All</button>
-        <button type="button" class="btn-home" onclick="location.href='https://github.com/16069728d/bbs-calculator'">Back to Home</button>
+    <div class="footer-btns">
+        <button type="button" class="btn-reset" onclick="resetCalculator()">Reset All</button>
+        <button type="button" class="btn-home" onclick="window.location.href='https://github.com/16069728d/bbs-calculator'">Back to Home</button>
     </div>
 </div>
 
 <script>
-    const items = [
+    const bbsItems = [
         "Sitting to standing",
         "Standing unsupported (2 min)",
         "Sitting with back unsupported (2 min)",
         "Standing to sitting",
         "Transfers",
-        "Standing unsupported with eyes closed (10s)",
+        "Standing unsupported with eyes closed (10 sec)",
         "Standing unsupported with feet together",
         "Reaching forward with outstretched arm",
         "Pick up object from floor",
-        "Turning to look behind over left/right shoulders",
+        "Turning to look behind over shoulders",
         "Turn 360 degrees",
-        "Place alternate foot on step or stool (8 times)",
-        "Standing unsupported one foot in front (tandem)",
+        "Place alternate foot on step (8 times)",
+        "Standing unsupported one foot in front",
         "Standing on one leg"
     ];
 
+    const questionsList = document.getElementById('questions-list');
+
+    // Initialize the UI
     function init() {
-        const container = document.getElementById('questions-container');
-        items.forEach((item, index) => {
-            const qNum = index + 1;
-            const html = `
-                <div class="question-block" id="block-q${qNum}">
-                    <span class="question-title">${qNum}. ${item}</span>
-                    <div class="options">
-                        ${[0, 1, 2, 3, 4].map(score => `
-                            <div class="option-item">
-                                <input type="radio" name="q${qNum}" value="${score}" onchange="handleLogic()">
-                                <br><small>${score}</small>
-                            </div>
-                        `).join('')}
-                    </div>
-                    ${qNum === 2 ? '<div class="clinical-note">If score is 4, Item 3 is auto-filled.</div>' : ''}
+        bbsItems.forEach((text, i) => {
+            const qNum = i + 1;
+            const block = document.createElement('div');
+            block.className = 'question-block';
+            block.id = block-q${qNum};
+
+            let hint = "";
+            if(qNum === 2) hint = "Score 4 auto-fills Item 3.";
+            if(qNum === 6) hint = "Requires Q2 > 0.";
+
+            block.innerHTML = `
+                <span class="question-label">${qNum}. ${text}</span>
+                <div class="options-row">
+                    ${[0, 1, 2, 3, 4].map(val => `
+                        <div class="option">
+                            <input type="radio" name="q${qNum}" value="${val}" onchange="applyClinicalLogic()">
+                            <br><small>${val}</small>
+                        </div>
+                    `).join('')}
                 </div>
+                ${hint ? <span class="clinical-hint">${hint}</span> : ''}
             `;
-            container.insertAdjacentHTML('beforeend', html);
+            questionsList.appendChild(block);
         });
     }
 
-    function handleLogic() {
-        const form = document.forms['bbs-form'];
-        const q2 = parseInt(form.elements['q2']?.value);
-
-        // 1. REFRESH STATE: Unlock everything first to fix the "correction bug"
+    function applyClinicalLogic() {
+        const form = document.forms['bbsForm'];
+        
+        // 1. REFRESH ALL STATES (Technical bug fix: prevents locking malfunction)
         for (let i = 1; i <= 14; i++) {
-            unlockItem(i);
+            const block = document.getElementById(block-q${i});
+            block.classList.remove('locked');
+            // We only unlock, we don't clear values here to allow the user to see what they picked
         }
+
+        // Get current values
+        const q2Val = getRadioValue('q2');
 
         // 2. CLINICAL RULE: If Q2 (Standing) is 4 -> Q3 (Sitting) is 4 & Locked
-        // Ref: Official BBS administration manual
-        if (q2 === 4) {
-            lockAndSetItem(3, 4);
+        if (q2Val === 4) {
+            setAndLock('q3', 4);
         }
 
-        // 3. CLINICAL RULE: If Q2 (Standing) is 0 -> Dynamic standing (Q6-Q14) are 0
-        if (q2 === 0) {
+        // 3. CLINICAL RULE: If Q2 (Standing) is 0 -> Dynamic standing (Q6-Q14) are 0 & Locked
+        if (q2Val === 0) {
             for (let i = 6; i <= 14; i++) {
-                lockAndSetItem(i, 0);
+                setAndLock('q' + i, 0);
             }
         }
 
-        // NOTE: Q3 logic removed based on consensus for MSK/Hip pathology patients
-        
-        calculateTotal();
+        // Note: Q3 -> Global zero logic removed to allow for MSK clinical judgment as requested.
+
+        updateTotal();
     }
 
-    function lockAndSetItem(qNum, value) {
-        const block = document.getElementById(block-q${qNum});
-        const inputs = document.getElementsByName(q${qNum});
+    function setAndLock(name, value) {
+        const radios = document.getElementsByName(name);
+        const block = document.getElementById(block-${name});
         
-        block.classList.add('locked');
-        inputs.forEach(input => {
-            input.checked = (parseInt(input.value) === value);
+        radios.forEach(r => {
+            r.checked = (parseInt(r.value) === value);
         });
+        block.classList.add('locked');
     }
 
-    function unlockItem(qNum) {
-        const block = document.getElementById(block-q${qNum});
-        block.classList.remove('locked');
+    function getRadioValue(name) {
+        const radio = document.querySelector(input[name="${name}"]:checked);
+        return radio ? parseInt(radio.value) : null;
     }
 
-    function calculateTotal() {
-        const formData = new FormData(document.getElementById('bbs-form'));
+    function updateTotal() {
         let total = 0;
-        for (let value of formData.values()) {
-            total += parseInt(value);
-        }
+        const checkedOptions = document.querySelectorAll('input[type="radio"]:checked');
+        checkedOptions.forEach(opt => {
+            total += parseInt(opt.value);
+        });
         document.getElementById('total-score').innerText = total;
     }
 
-    function resetForm() {
-        document.getElementById('bbs-form').reset();
-        handleLogic(); // Re-run logic to clear locks
+    function resetCalculator() {
+        document.getElementById('bbsForm').reset();
+        // Clear all locked styles
+        for (let i = 1; i <= 14; i++) {
+            document.getElementById(block-q${i}).classList.remove('locked');
+        }
+        updateTotal();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
