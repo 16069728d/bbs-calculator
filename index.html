@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBS Clinical Tool | HA PT Dept</title>
+    <title>BBS Clinical Tool | PT Dept</title>
     <style>
         :root {
             --ha-blue: #007b85; 
             --bg-light: #f4f7f9;
             --locked-bg: #e9ecef;
             --text-main: #2d3436;
-            --accent-orange: #e67e22;
+            --border-color: #dfe6e9;
         }
 
         body {
@@ -22,7 +22,7 @@
         }
 
         .calculator-card {
-            max-width: 650px;
+            max-width: 700px;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
@@ -45,20 +45,20 @@
             background: #fff;
             padding: 15px;
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: bold;
             border-bottom: 4px solid var(--ha-blue);
             z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
         .item-container { padding: 15px; }
 
         .question-block {
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             padding: 15px;
             border-radius: 8px;
-            border: 1px solid #dfe6e9;
+            border: 1px solid var(--border-color);
             background: #fff;
         }
 
@@ -68,52 +68,60 @@
             pointer-events: none;
         }
 
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-
         .question-label {
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 800;
+            font-size: 1.1rem;
             color: var(--ha-blue);
+            display: block;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
         }
 
-        .criteria-toggle {
-            font-size: 0.75rem;
-            color: var(--accent-orange);
-            cursor: pointer;
-            text-decoration: underline;
-            font-weight: bold;
-        }
-
-        .criteria-box {
-            display: none;
-            background: #fff9f1;
-            padding: 10px;
-            border-left: 3px solid var(--accent-orange);
-            margin-bottom: 12px;
-            font-size: 0.85rem;
-            white-space: pre-line;
-        }
-
-        .options-row {
+        /* Vertical Radio List */
+        .options-list {
             display: flex;
-            justify-content: space-between;
-            gap: 5px;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .option { text-align: center; flex: 1; }
-        .option input { width: 20px; height: 20px; cursor: pointer; }
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .option-item:hover { background: #f1f1f1; }
+
+        .option-item input {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .score-badge {
+            font-weight: bold;
+            color: var(--ha-blue);
+            margin-right: 5px;
+        }
 
         .clinical-hint {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: #d63031;
-            margin-top: 8px;
+            margin-top: 10px;
             display: block;
-            font-style: italic;
+            font-weight: 600;
         }
 
         .footer-btns {
@@ -141,11 +149,11 @@
 <div class="calculator-card">
     <div class="header">
         <h1>Berg Balance Scale (BBS)</h1>
-        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Enhanced Clinical Decision Support</p>
+        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Standardized Scoring Guide</p>
     </div>
 
     <div class="score-banner">
-        Total BBS Score: <span id="total-score">0</span> / 56
+        Total Score: <span id="total-score">0</span> / 56
     </div>
 
     <div class="item-container">
@@ -162,20 +170,20 @@
 
 <script>
     const bbsData = [
-        { name: "Sitting to standing", criteria: "4: Able to stand without hands; independent\n3: Independent with hands\n2: Independent using hands after several tries\n1: Needs minimal assist to stand/stabilize\n0: Needs moderate/maximal assist" },
-        { name: "Standing unsupported (2 min)", criteria: "4: Able to stand safely 2 mins\n3: Able to stand 2 mins with supervision\n2: Able to stand 30 secs unsupported\n1: Needs several tries to stand 30 secs unsupported\n0: Unable to stand 30 secs unassisted" },
-        { name: "Sitting back unsupported (2 min)", criteria: "4: Safe/secure for 2 mins\n3: Able to sit 2 mins under supervision\n2: Able to sit 30 secs\n1: Able to sit 10 secs\n0: Unable to sit without support 10 secs" },
-        { name: "Standing to sitting", criteria: "4: Sits safely with minimal use of hands\n3: Controls descent using hands\n2: Uses back of legs against chair to control descent\n1: Sits independently but has uncontrolled descent\n0: Needs assist to sit" },
-        { name: "Transfers (Pivot)", criteria: "4: Able to transfer safely with minor use of hands\n3: Able to transfer safely definite need of hands\n2: Able to transfer with verbal cueing/supervision\n1: Needs one person to assist\n0: Needs two people to assist/supervise to be safe" },
-        { name: "Standing eyes closed (10 sec)", criteria: "4: Able to stand 10 secs safely\n3: Able to stand 10 secs with supervision\n2: Able to stand 3 secs\n1: Unable to keep eyes closed 3 secs but stays safe\n0: Needs help to keep from falling" },
-        { name: "Standing feet together", criteria: "4: Able to place feet together independently and stand 1 min safely\n3: Able to place feet together independently and stand 1 min with supervision\n2: Able to place feet together independently but unable to hold for 30 secs\n1: Needs help to attain position but able to stand 15 secs\n0: Needs help to attain position and unable to hold for 15 secs" },
-        { name: "Reaching forward", criteria: "4: Can reach forward confidently >25 cm (10 in)\n3: Can reach forward >12 cm (5 in)\n2: Can reach forward >5 cm (2 in)\n1: Reaches forward but needs supervision\n0: Loses balance while trying/needs external support" },
-        { name: "Pick up object from floor", criteria: "4: Able to pick up slipper safely and easily\n3: Able to pick up slipper but needs supervision\n2: Unable to pick up but reaches 2-5cm (1-2 in) from slipper and keeps balance independently\n1: Unable to pick up and needs supervision while trying\n0: Unable to try/needs assist to keep from falling" },
-        { name: "Turning to look behind", criteria: "4: Looks behind from both sides and weight shifts well\n3: Looks behind one side only; other side shows less weight shift\n2: Turns sideways only but maintains balance\n1: Needs supervision when turning\n0: Needs assist to keep from falling" },
-        { name: "Turn 360 degrees", criteria: "4: Able to turn 360 degrees safely in 4 secs or less\n3: Able to turn 360 degrees safely one side only in 4 secs or less\n2: Able to turn 360 degrees safely but slowly\n1: Needs close supervision or verbal cueing\n0: Needs assistance while turning" },
-        { name: "Stool Stepping (8 times)", criteria: "4: Able to stand independently and safely and complete 8 steps in 20 secs\n3: Able to stand independently and complete 8 steps in >20 secs\n2: Able to complete 4 steps without assistance with supervision\n1: Able to complete >2 steps needs minimal assist\n0: Needs assistance to keep from falling/unable to try" },
-        { name: "Tandem Standing (30 sec)", criteria: "4: Able to place foot tandem independently and hold 30 secs\n3: Able to place foot ahead of other independently and hold 30 secs\n2: Able to take small step independently and hold 30 secs\n1: Needs help to step but can hold 15 secs\n0: Loses balance while stepping or standing" },
-        { name: "Standing on one leg", criteria: "4: Able to lift leg independently and hold >10 secs\n3: Able to lift leg independently and hold 5-10 secs\n2: Able to lift leg independently and hold ≥3 secs\n1: Tries to lift leg; unable to hold 3 secs but remains independent\n0: Unable to try or needs assist to prevent fall" }
+        { name: "Sitting to standing", criteria: ["Able to stand without hands; independent", "Independent with hands", "Independent using hands after several tries", "Needs minimal assist to stand/stabilize", "Needs moderate/maximal assist"] },
+        { name: "Standing unsupported (2 min)", criteria: ["Able to stand safely 2 mins", "Able to stand 2 mins with supervision", "Able to stand 30 secs unsupported", "Needs several tries to stand 30 secs unsupported", "Unable to stand 30 secs unassisted"] },
+        { name: "Sitting back unsupported (2 min)", criteria: ["Safe/secure for 2 mins", "Able to sit 2 mins under supervision", "Able to sit 30 secs", "Able to sit 10 secs", "Unable to sit without support 10 secs"] },
+        { name: "Standing to sitting", criteria: ["Sits safely with minimal use of hands", "Controls descent using hands", "Uses back of legs against chair to control descent", "Sits independently but has uncontrolled descent", "Needs assist to sit"] },
+        { name: "Transfers (Pivot)", criteria: ["Able to transfer safely with minor use of hands", "Able to transfer safely definite need of hands", "Able to transfer with verbal cueing/supervision", "Needs one person to assist", "Needs two people to assist/supervise"] },
+        { name: "Standing eyes closed (10 sec)", criteria: ["Able to stand 10 secs safely", "Able to stand 10 secs with supervision", "Able to stand 3 secs", "Unable to keep eyes closed 3 secs but stays safe", "Needs help to keep from falling"] },
+        { name: "Standing feet together", criteria: ["Able to place feet together independently and stand 1 min safely", "Able to place feet together independently and stand 1 min with supervision", "Able to place feet together independently but unable to hold for 30 secs", "Needs help to attain position but able to stand 15 secs", "Needs help to attain position and unable to hold for 15 secs"] },
+        { name: "Reaching forward", criteria: ["Can reach forward confidently >25 cm (10 in)", "Can reach forward >12 cm (5 in)", "Can reach forward >5 cm (2 in)", "Reaches forward but needs supervision", "Loses balance while trying/needs external support"] },
+        { name: "Pick up object from floor", criteria: ["Able to pick up slipper safely and easily", "Able to pick up slipper but needs supervision", "Unable to pick up but reaches 2-5cm (1-2 in) from slipper independently", "Unable to pick up and needs supervision while trying", "Unable to try/needs assist to keep from falling"] },
+        { name: "Turning to look behind", criteria: ["Looks behind from both sides and weight shifts well", "Looks behind one side only; other side shows less weight shift", "Turns sideways only but maintains balance", "Needs supervision when turning", "Needs assist to keep from falling"] },
+        { name: "Turn 360 degrees", criteria: ["Able to turn 360 degrees safely in 4 secs or less", "Able to turn 360 degrees safely one side only in 4 secs or less", "Able to turn 360 degrees safely but slowly", "Needs close supervision or verbal cueing", "Needs assistance while turning"] },
+        { name: "Stool Stepping (8 times)", criteria: ["Able to stand independently and safely and complete 8 steps in 20 secs", "Able to stand independently and complete 8 steps in >20 secs", "Able to complete 4 steps without assistance with supervision", "Able to complete >2 steps needs minimal assist", "Needs assistance to keep from falling/unable to try"] },
+        { name: "Tandem Standing (30 sec)", criteria: ["Able to place foot tandem independently and hold 30 secs", "Able to place foot ahead of other independently and hold 30 secs", "Able to take small step independently and hold 30 secs", "Needs help to step but can hold 15 secs", "Loses balance while stepping or standing"] },
+        { name: "Standing on one leg", criteria: ["Able to lift leg independently and hold >10 secs", "Able to lift leg independently and hold 5-10 secs", "Able to lift leg independently and hold ≥3 secs", "Tries to lift leg; unable to hold 3 secs but remains independent", "Unable to try or needs assist to prevent fall"] }
     ];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -186,43 +194,38 @@
             block.className = 'question-block';
             block.id = `block-q${qNum}`;
 
+            // We generate scores 4 down to 0
+            const optionsHtml = item.criteria.map((text, index) => {
+                const score = 4 - index;
+                return `
+                    <label class="option-item">
+                        <input type="radio" name="q${qNum}" value="${score}" onchange="applyClinicalLogic()">
+                        <span class="option-text"><span class="score-badge">${score}:</span> ${text}</span>
+                    </label>
+                `;
+            }).join('');
+
             block.innerHTML = `
-                <div class="question-header">
-                    <span class="question-label">${qNum}. ${item.name}</span>
-                    <span class="criteria-toggle" onclick="toggleCriteria(${qNum})">Criteria</span>
-                </div>
-                <div class="criteria-box" id="criteria-${qNum}">${item.criteria}</div>
-                <div class="options-row">
-                    ${[0, 1, 2, 3, 4].map(val => `
-                        <div class="option">
-                            <input type="radio" name="q${qNum}" value="${val}" onchange="applyClinicalLogic()">
-                            <br><small>${val}</small>
-                        </div>
-                    `).join('')}
-                </div>
-                ${qNum === 2 ? '<span class="clinical-hint">Note: Score 4 auto-fills Item 3</span>' : ''}
+                <span class="question-label">${qNum}. ${item.name}</span>
+                <div class="options-list">${optionsHtml}</div>
+                ${qNum === 2 ? '<span class="clinical-hint">BBS Logic: Score 4 auto-fills Item 3</span>' : ''}
             `;
             list.appendChild(block);
         });
     });
 
-    function toggleCriteria(n) {
-        const box = document.getElementById(`criteria-${n}`);
-        box.style.display = (box.style.display === 'block') ? 'none' : 'block';
-    }
-
     function applyClinicalLogic() {
         const q2Val = getVal('q2');
 
-        // Reset all locks
+        // Reset all locks to fix the correction bug
         for (let i = 1; i <= 14; i++) {
             document.getElementById(`block-q${i}`).classList.remove('locked');
         }
 
-        // Rule: Q2=4 -> Q3 is 4 & Locked
+        // Rule 1: Q2=4 -> Q3 is 4 & Locked
         if (q2Val === 4) setAndLock('q3', 4);
 
-        // Rule: Q2=0 -> Q6-14 are 0 & Locked
+        // Rule 2: Q2=0 -> Q6-14 are 0 & Locked
         if (q2Val === 0) {
             for (let i = 6; i <= 14; i++) setAndLock('q'+i, 0);
         }
