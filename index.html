@@ -11,7 +11,6 @@
             --locked-bg: #e9ecef;
             --text-main: #2d3436;
             --border-color: #dfe6e9;
-            /* Risk Colors */
             --risk-low: #27ae60;
             --risk-med: #f39c12;
             --risk-high: #d63031;
@@ -27,7 +26,7 @@
 
         .calculator-card {
             max-width: 700px;
-            margin: 0 auto;
+            margin: 0 auto 100px auto; /* Margin at bottom for the sticky footer */
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -42,30 +41,6 @@
         }
 
         .header h1 { margin: 0; font-size: 1.3rem; }
-
-        .score-banner {
-            position: sticky;
-            top: 0;
-            background: #fff;
-            padding: 15px;
-            text-align: center;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border-bottom: 4px solid var(--ha-blue);
-        }
-
-        .total-display { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
-        
-        .risk-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            color: white;
-            font-size: 0.9rem;
-            font-weight: bold;
-            background-color: #bdc3c7; /* Default gray */
-            transition: background-color 0.3s ease;
-        }
 
         .item-container { padding: 15px; }
 
@@ -93,11 +68,7 @@
             padding-bottom: 5px;
         }
 
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
 
         .option-item {
             display: flex;
@@ -107,46 +78,63 @@
             border-radius: 6px;
             background: #f9f9f9;
             cursor: pointer;
-            transition: background 0.2s;
             border: 1px solid transparent;
         }
 
-        .option-item:hover { background: #f1f1f1; border-color: #ddd; }
+        .option-item:hover { background: #f1f1f1; }
 
-        .option-item input {
-            width: 20px;
-            height: 20px;
-            margin-top: 2px;
-            cursor: pointer;
-        }
+        .option-item input { width: 20px; height: 20px; margin-top: 2px; }
 
         .option-text { font-size: 0.95rem; line-height: 1.4; }
 
         .score-badge { font-weight: bold; color: var(--ha-blue); margin-right: 5px; }
 
-        .clinical-hint {
-            font-size: 0.8rem;
-            color: #d63031;
-            margin-top: 10px;
-            display: block;
-            font-weight: 600;
+        /* Sticky Bottom Results Bar */
+        .results-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+            padding: 15px;
+            text-align: center;
+            z-index: 2000;
+            border-top: 3px solid var(--ha-blue);
         }
 
-        .footer-btns {
-            padding: 20px;
+        .score-row { font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; }
+        
+        .risk-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            background-color: #bdc3c7;
+        }
+
+        .incomplete-warning {
+            color: #d63031;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .action-btns {
+            margin-top: 10px;
             display: flex;
             gap: 10px;
-            background: #f8f9fa;
+            justify-content: center;
         }
 
         button {
-            flex: 1;
-            padding: 14px;
+            padding: 10px 20px;
             border: none;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1rem;
         }
 
         .btn-reset { background: #636e72; color: white; }
@@ -158,12 +146,7 @@
 <div class="calculator-card">
     <div class="header">
         <h1>Berg Balance Scale (BBS)</h1>
-        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional Outcome Measurement</p>
-    </div>
-
-    <div class="score-banner">
-        <div class="total-display">Score: <span id="total-score">0</span> / 56</div>
-        <div id="risk-status" class="risk-badge">Awaiting Input</div>
+        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional Outcome Measure Tool</p>
     </div>
 
     <div class="item-container">
@@ -171,10 +154,16 @@
             <div id="questions-list"></div>
         </form>
     </div>
+</div>
 
-    <div class="footer-btns">
-        <button type="button" class="btn-reset" onclick="resetCalculator()">Reset All</button>
-        <button type="button" class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Back to Home</button>
+<div class="results-footer">
+    <div class="score-row">Total: <span id="total-score">0</span> / 56</div>
+    <div id="risk-status" class="risk-status">Awaiting Input</div>
+    <div id="incomplete-msg" class="incomplete-warning"></div>
+    
+    <div class="action-btns">
+        <button type="button" class="btn-reset" onclick="resetCalculator()">Reset</button>
+        <button type="button" class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Home</button>
     </div>
 </div>
 
@@ -202,7 +191,7 @@
             const qNum = i + 1;
             const block = document.createElement('div');
             block.className = 'question-block';
-            block.id = `block-q${qNum}`;
+            block.id = block-q${qNum};
 
             const optionsHtml = item.criteria.map((text, index) => {
                 const score = 4 - index;
@@ -217,20 +206,24 @@
             block.innerHTML = `
                 <span class="question-label">${qNum}. ${item.name}</span>
                 <div class="options-list">${optionsHtml}</div>
-                ${qNum === 2 ? '<span class="clinical-hint">BBS Rule: Score 4 auto-fills Item 3</span>' : ''}
             `;
             list.appendChild(block);
         });
+        updateTotal(); // Run once to set initial state
     });
 
     function applyClinicalLogic() {
+        // Reset all locks to fix correction state
         for (let i = 1; i <= 14; i++) {
-            document.getElementById(`block-q${i}`).classList.remove('locked');
+            document.getElementById(block-q${i}).classList.remove('locked');
         }
 
         const q2Val = getVal('q2');
 
+        // BBS Rule: Q2=4 -> Q3 is 4 & Locked
         if (q2Val === 4) setAndLock('q3', 4);
+
+        // Rule: Q2=0 -> Q6-14 are 0 & Locked
         if (q2Val === 0) {
             for (let i = 6; i <= 14; i++) setAndLock('q'+i, 0);
         }
@@ -241,45 +234,60 @@
     function setAndLock(name, val) {
         const radios = document.getElementsByName(name);
         radios.forEach(r => r.checked = (parseInt(r.value) === val));
-        document.getElementById(`block-${name}`).classList.add('locked');
+        document.getElementById(block-${name}).classList.add('locked');
     }
 
     function getVal(name) {
-        const r = document.querySelector(`input[name="${name}"]:checked`);
+        const r = document.querySelector(input[name="${name}"]:checked);
         return r ? parseInt(r.value) : null;
     }
 
     function updateTotal() {
         let total = 0;
-        const radios = document.querySelectorAll('input[type="radio"]:checked');
-        radios.forEach(r => total += parseInt(r.value));
+        let answeredCount = 0;
+        let missingItems = [];
+
+        for (let i = 1; i <= 14; i++) {
+            const val = getVal('q' + i);
+            if (val !== null) {
+                total += val;
+                answeredCount++;
+            } else {
+                missingItems.push(i);
+            }
+        }
+
         document.getElementById('total-score').innerText = total;
 
         const riskBadge = document.getElementById('risk-status');
+        const incompleteMsg = document.getElementById('incomplete-msg');
         
-        // Only interpret if at least one question has been answered
-        if(radios.length === 0) {
-            riskBadge.innerText = "Awaiting Input";
+        // Handle Interpretation and Warnings
+        if(answeredCount < 14) {
+            riskBadge.innerText = "Incomplete Assessment";
             riskBadge.style.backgroundColor = "#bdc3c7";
-            return;
-        }
-
-        if (total >= 41) {
-            riskBadge.innerText = "Low Fall Risk";
-            riskBadge.style.backgroundColor = "var(--risk-low)";
-        } else if (total >= 21) {
-            riskBadge.innerText = "Medium Fall Risk";
-            riskBadge.style.backgroundColor = "var(--risk-med)";
+            incompleteMsg.innerText = "Please answer items: " + missingItems.join(", ");
         } else {
-            riskBadge.innerText = "High Fall Risk";
-            riskBadge.style.backgroundColor = "var(--risk-high)";
+            incompleteMsg.innerText = ""; // Clear warning
+            if (total >= 41) {
+                riskBadge.innerText = "Low Fall Risk";
+                riskBadge.style.backgroundColor = "var(--risk-low)";
+            } else if (total >= 21) {
+                riskBadge.innerText = "Medium Fall Risk";
+                riskBadge.style.backgroundColor = "var(--risk-med)";
+            } else {
+                riskBadge.innerText = "High Fall Risk";
+                riskBadge.style.backgroundColor = "var(--risk-high)";
+            }
         }
     }
 
     function resetCalculator() {
-        document.getElementById('bbsForm').reset();
-        applyClinicalLogic();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if(confirm("Clear all scores?")) {
+            document.getElementById('bbsForm').reset();
+            applyClinicalLogic();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 </script>
 
