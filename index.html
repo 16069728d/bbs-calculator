@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBS Calculator | PT Department</title>
+    <title>BBS Clinical Tool | HA PT Dept</title>
     <style>
         :root {
             --ha-blue: #007b85; 
             --bg-light: #f4f7f9;
             --locked-bg: #e9ecef;
             --text-main: #2d3436;
+            --accent-orange: #e67e22;
         }
 
         body {
@@ -17,26 +18,26 @@
             background-color: var(--bg-light);
             color: var(--text-main);
             margin: 0;
-            padding: 15px;
+            padding: 10px;
         }
 
         .calculator-card {
-            max-width: 600px;
+            max-width: 650px;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
         .header {
             background: var(--ha-blue);
             color: white;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
         }
 
-        .header h1 { margin: 0; font-size: 1.4rem; }
+        .header h1 { margin: 0; font-size: 1.3rem; }
 
         .score-banner {
             position: sticky;
@@ -46,18 +47,19 @@
             text-align: center;
             font-size: 1.2rem;
             font-weight: bold;
-            border-bottom: 3px solid var(--ha-blue);
+            border-bottom: 4px solid var(--ha-blue);
             z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .item-container { padding: 15px; }
 
         .question-block {
-            margin-bottom: 12px;
-            padding: 12px;
+            margin-bottom: 15px;
+            padding: 15px;
             border-radius: 8px;
             border: 1px solid #dfe6e9;
-            transition: 0.2s;
+            background: #fff;
         }
 
         .question-block.locked {
@@ -66,20 +68,53 @@
             pointer-events: none;
         }
 
-        .question-label {
-            font-weight: 600;
-            display: block;
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 10px;
-            font-size: 0.95rem;
+        }
+
+        .question-label {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--ha-blue);
+        }
+
+        .criteria-toggle {
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .criteria-box {
+            display: none;
+            background: #fff9f1;
+            padding: 10px;
+            border-left: 3px solid var(--accent-orange);
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            white-space: pre-line;
         }
 
         .options-row {
             display: flex;
             justify-content: space-between;
+            gap: 5px;
         }
 
         .option { text-align: center; flex: 1; }
-        .option input { cursor: pointer; width: 18px; height: 18px; }
+        .option input { width: 20px; height: 20px; cursor: pointer; }
+
+        .clinical-hint {
+            font-size: 0.75rem;
+            color: #d63031;
+            margin-top: 8px;
+            display: block;
+            font-style: italic;
+        }
 
         .footer-btns {
             padding: 20px;
@@ -99,22 +134,14 @@
 
         .btn-reset { background: #636e72; color: white; }
         .btn-home { background: var(--ha-blue); color: white; }
-
-        .clinical-hint {
-            font-size: 0.7rem;
-            color: #d63031;
-            font-weight: bold;
-            margin-top: 5px;
-            display: block;
-        }
     </style>
 </head>
 <body>
 
 <div class="calculator-card">
     <div class="header">
-        <h1>Berg Balance Scale</h1>
-        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional Clinical Edition</p>
+        <h1>Berg Balance Scale (BBS)</h1>
+        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Enhanced Clinical Decision Support</p>
     </div>
 
     <div class="score-banner">
@@ -123,8 +150,7 @@
 
     <div class="item-container">
         <form id="bbsForm">
-            <div id="questions-list">
-                </div>
+            <div id="questions-list"></div>
         </form>
     </div>
 
@@ -135,44 +161,37 @@
 </div>
 
 <script>
-    const bbsItems = [
-        "Sitting to standing",
-        "Standing unsupported (2 min)",
-        "Sitting with back unsupported (2 min)",
-        "Standing to sitting",
-        "Transfers",
-        "Standing unsupported with eyes closed (10 sec)",
-        "Standing unsupported with feet together",
-        "Reaching forward with outstretched arm",
-        "Pick up object from floor",
-        "Turning to look behind over shoulders",
-        "Turn 360 degrees",
-        "Place alternate foot on step (8 times)",
-        "Standing unsupported one foot in front",
-        "Standing on one leg"
+    const bbsData = [
+        { name: "Sitting to standing", criteria: "4: Able to stand without hands; independent\n3: Independent with hands\n2: Independent using hands after several tries\n1: Needs minimal assist to stand/stabilize\n0: Needs moderate/maximal assist" },
+        { name: "Standing unsupported (2 min)", criteria: "4: Able to stand safely 2 mins\n3: Able to stand 2 mins with supervision\n2: Able to stand 30 secs unsupported\n1: Needs several tries to stand 30 secs unsupported\n0: Unable to stand 30 secs unassisted" },
+        { name: "Sitting back unsupported (2 min)", criteria: "4: Safe/secure for 2 mins\n3: Able to sit 2 mins under supervision\n2: Able to sit 30 secs\n1: Able to sit 10 secs\n0: Unable to sit without support 10 secs" },
+        { name: "Standing to sitting", criteria: "4: Sits safely with minimal use of hands\n3: Controls descent using hands\n2: Uses back of legs against chair to control descent\n1: Sits independently but has uncontrolled descent\n0: Needs assist to sit" },
+        { name: "Transfers (Pivot)", criteria: "4: Able to transfer safely with minor use of hands\n3: Able to transfer safely definite need of hands\n2: Able to transfer with verbal cueing/supervision\n1: Needs one person to assist\n0: Needs two people to assist/supervise to be safe" },
+        { name: "Standing eyes closed (10 sec)", criteria: "4: Able to stand 10 secs safely\n3: Able to stand 10 secs with supervision\n2: Able to stand 3 secs\n1: Unable to keep eyes closed 3 secs but stays safe\n0: Needs help to keep from falling" },
+        { name: "Standing feet together", criteria: "4: Able to place feet together independently and stand 1 min safely\n3: Able to place feet together independently and stand 1 min with supervision\n2: Able to place feet together independently but unable to hold for 30 secs\n1: Needs help to attain position but able to stand 15 secs\n0: Needs help to attain position and unable to hold for 15 secs" },
+        { name: "Reaching forward", criteria: "4: Can reach forward confidently >25 cm (10 in)\n3: Can reach forward >12 cm (5 in)\n2: Can reach forward >5 cm (2 in)\n1: Reaches forward but needs supervision\n0: Loses balance while trying/needs external support" },
+        { name: "Pick up object from floor", criteria: "4: Able to pick up slipper safely and easily\n3: Able to pick up slipper but needs supervision\n2: Unable to pick up but reaches 2-5cm (1-2 in) from slipper and keeps balance independently\n1: Unable to pick up and needs supervision while trying\n0: Unable to try/needs assist to keep from falling" },
+        { name: "Turning to look behind", criteria: "4: Looks behind from both sides and weight shifts well\n3: Looks behind one side only; other side shows less weight shift\n2: Turns sideways only but maintains balance\n1: Needs supervision when turning\n0: Needs assist to keep from falling" },
+        { name: "Turn 360 degrees", criteria: "4: Able to turn 360 degrees safely in 4 secs or less\n3: Able to turn 360 degrees safely one side only in 4 secs or less\n2: Able to turn 360 degrees safely but slowly\n1: Needs close supervision or verbal cueing\n0: Needs assistance while turning" },
+        { name: "Stool Stepping (8 times)", criteria: "4: Able to stand independently and safely and complete 8 steps in 20 secs\n3: Able to stand independently and complete 8 steps in >20 secs\n2: Able to complete 4 steps without assistance with supervision\n1: Able to complete >2 steps needs minimal assist\n0: Needs assistance to keep from falling/unable to try" },
+        { name: "Tandem Standing (30 sec)", criteria: "4: Able to place foot tandem independently and hold 30 secs\n3: Able to place foot ahead of other independently and hold 30 secs\n2: Able to take small step independently and hold 30 secs\n1: Needs help to step but can hold 15 secs\n0: Loses balance while stepping or standing" },
+        { name: "Standing on one leg", criteria: "4: Able to lift leg independently and hold >10 secs\n3: Able to lift leg independently and hold 5-10 secs\n2: Able to lift leg independently and hold ≥3 secs\n1: Tries to lift leg; unable to hold 3 secs but remains independent\n0: Unable to try or needs assist to prevent fall" }
     ];
 
-    // Ensure DOM is fully loaded before running script
-    document.addEventListener('DOMContentLoaded', function() {
-        renderQuestions();
-    });
-
-    function renderQuestions() {
+    document.addEventListener('DOMContentLoaded', () => {
         const list = document.getElementById('questions-list');
-        list.innerHTML = ""; // Clear existing
-
-        bbsItems.forEach((text, i) => {
+        bbsData.forEach((item, i) => {
             const qNum = i + 1;
             const block = document.createElement('div');
             block.className = 'question-block';
             block.id = `block-q${qNum}`;
 
-            let hint = "";
-            if(qNum === 2) hint = "Score 4 → Auto-fills Item 3 (BBS Protocol)";
-            if(qNum === 6) hint = "Requires Q2 ability.";
-
             block.innerHTML = `
-                <span class="question-label">${qNum}. ${text}</span>
+                <div class="question-header">
+                    <span class="question-label">${qNum}. ${item.name}</span>
+                    <span class="criteria-toggle" onclick="toggleCriteria(${qNum})">Criteria</span>
+                </div>
+                <div class="criteria-box" id="criteria-${qNum}">${item.criteria}</div>
                 <div class="options-row">
                     ${[0, 1, 2, 3, 4].map(val => `
                         <div class="option">
@@ -181,67 +200,56 @@
                         </div>
                     `).join('')}
                 </div>
-                ${hint ? `<span class="clinical-hint">${hint}</span>` : ''}
+                ${qNum === 2 ? '<span class="clinical-hint">Note: Score 4 auto-fills Item 3</span>' : ''}
             `;
             list.appendChild(block);
         });
+    });
+
+    function toggleCriteria(n) {
+        const box = document.getElementById(`criteria-${n}`);
+        box.style.display = (box.style.display === 'block') ? 'none' : 'block';
     }
 
     function applyClinicalLogic() {
-        const form = document.getElementById('bbsForm');
-        
-        // 1. Reset all locks first (Solves the "Correction Bug")
+        const q2Val = getVal('q2');
+
+        // Reset all locks
         for (let i = 1; i <= 14; i++) {
             document.getElementById(`block-q${i}`).classList.remove('locked');
         }
 
-        // 2. Get value of Q2
-        const q2Radio = document.querySelector('input[name="q2"]:checked');
-        const q2Val = q2Radio ? parseInt(q2Radio.value) : null;
+        // Rule: Q2=4 -> Q3 is 4 & Locked
+        if (q2Val === 4) setAndLock('q3', 4);
 
-        // 3. CLINICAL RULE: Q2=4 -> Q3 is 4 & Locked
-        if (q2Val === 4) {
-            setAndLock('q3', 4);
-        }
-
-        // 4. CLINICAL RULE: Q2=0 -> Q6-Q14 are 0 & Locked
+        // Rule: Q2=0 -> Q6-14 are 0 & Locked
         if (q2Val === 0) {
-            for (let i = 6; i <= 14; i++) {
-                setAndLock('q' + i, 0);
-            }
+            for (let i = 6; i <= 14; i++) setAndLock('q'+i, 0);
         }
 
         updateTotal();
     }
 
-    function setAndLock(qName, value) {
-        const radios = document.getElementsByName(qName);
-        const block = document.getElementById(`block-${qName}`);
-        
-        radios.forEach(r => {
-            if (parseInt(r.value) === value) {
-                r.checked = true;
-            }
-        });
-        if (block) block.classList.add('locked');
+    function setAndLock(name, val) {
+        const radios = document.getElementsByName(name);
+        radios.forEach(r => r.checked = (parseInt(r.value) === val));
+        document.getElementById(`block-${name}`).classList.add('locked');
+    }
+
+    function getVal(name) {
+        const r = document.querySelector(`input[name="${name}"]:checked`);
+        return r ? parseInt(r.value) : null;
     }
 
     function updateTotal() {
         let total = 0;
-        const checked = document.querySelectorAll('input[type="radio"]:checked');
-        checked.forEach(opt => {
-            total += parseInt(opt.value);
-        });
+        document.querySelectorAll('input[type="radio"]:checked').forEach(r => total += parseInt(r.value));
         document.getElementById('total-score').innerText = total;
     }
 
     function resetCalculator() {
         document.getElementById('bbsForm').reset();
-        // Remove all locks manually
-        for (let i = 1; i <= 14; i++) {
-            document.getElementById(`block-q${i}`).classList.remove('locked');
-        }
-        updateTotal();
+        applyClinicalLogic();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 </script>
