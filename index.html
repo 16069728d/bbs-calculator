@@ -26,11 +26,12 @@
 
         .calculator-card {
             max-width: 700px;
-            margin: 0 auto 100px auto; /* Margin at bottom for the sticky footer */
+            margin: 0 auto 160px auto; 
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
+            display: block !important; /* Ensure visibility */
         }
 
         .header {
@@ -42,7 +43,7 @@
 
         .header h1 { margin: 0; font-size: 1.3rem; }
 
-        .item-container { padding: 15px; }
+        .item-container { padding: 15px; min-height: 200px; }
 
         .question-block {
             margin-bottom: 25px;
@@ -82,11 +83,8 @@
         }
 
         .option-item:hover { background: #f1f1f1; }
-
-        .option-item input { width: 20px; height: 20px; margin-top: 2px; }
-
+        .option-item input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; }
         .option-text { font-size: 0.95rem; line-height: 1.4; }
-
         .score-badge { font-weight: bold; color: var(--ha-blue); margin-right: 5px; }
 
         /* Sticky Bottom Results Bar */
@@ -120,6 +118,7 @@
             font-size: 0.85rem;
             font-weight: bold;
             margin-top: 8px;
+            min-height: 1.2em;
         }
 
         .action-btns {
@@ -139,6 +138,15 @@
 
         .btn-reset { background: #636e72; color: white; }
         .btn-home { background: var(--ha-blue); color: white; }
+
+        #fix-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 0.7rem;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
@@ -151,14 +159,17 @@
 
     <div class="item-container">
         <form id="bbsForm">
-            <div id="questions-list"></div>
+            <div id="questions-list">
+                <p style="text-align:center; padding:20px;">Loading assessment items...</p>
+            </div>
         </form>
     </div>
+    <a href="#" id="fix-link" onclick="location.reload()">Items not showing? Click to refresh</a>
 </div>
 
 <div class="results-footer">
-    <div class="score-row">Total: <span id="total-score">0</span> / 56</div>
-    <div id="risk-status" class="risk-status">Awaiting Input</div>
+    <div class="score-row">Total Score: <span id="total-score">0</span> / 56</div>
+    <div id="risk-status" class="risk-badge" style="display:inline-block; padding:5px 15px; border-radius:20px; color:white; font-weight:bold; background-color:#bdc3c7;">Awaiting Input</div>
     <div id="incomplete-msg" class="incomplete-warning"></div>
     
     <div class="action-btns">
@@ -168,6 +179,7 @@
 </div>
 
 <script>
+    // Data Array
     const bbsData = [
         { name: "Sitting to standing", criteria: ["Able to stand without hands; independent", "Independent with hands", "Independent using hands after several tries", "Needs minimal assist to stand/stabilize", "Needs moderate/maximal assist"] },
         { name: "Standing unsupported (2 min)", criteria: ["Able to stand safely 2 mins", "Able to stand 2 mins with supervision", "Able to stand 30 secs unsupported", "Needs several tries to stand 30 secs unsupported", "Unable to stand 30 secs unassisted"] },
@@ -185,13 +197,18 @@
         { name: "Standing on one leg", criteria: ["Able to lift leg independently and hold >10 secs", "Able to lift leg independently and hold 5-10 secs", "Able to lift leg independently and hold ≥3 secs", "Tries to lift leg; unable to hold 3 secs but remains independent", "Unable to try or needs assist to prevent fall"] }
     ];
 
-    document.addEventListener('DOMContentLoaded', () => {
+    // THE RENDER FUNCTION
+    function buildForm() {
         const list = document.getElementById('questions-list');
+        if(!list) return;
+        
+        list.innerHTML = ""; // Clear the "Loading..." message
+
         bbsData.forEach((item, i) => {
             const qNum = i + 1;
             const block = document.createElement('div');
             block.className = 'question-block';
-            block.id = block-q${qNum};
+            block.id = `block-q${qNum}`;
 
             const optionsHtml = item.criteria.map((text, index) => {
                 const score = 4 - index;
@@ -209,36 +226,33 @@
             `;
             list.appendChild(block);
         });
-        updateTotal(); // Run once to set initial state
-    });
+        updateTotal(); 
+    }
 
+    // LOGIC FUNCTIONS
     function applyClinicalLogic() {
-        // Reset all locks to fix correction state
         for (let i = 1; i <= 14; i++) {
-            document.getElementById(block-q${i}).classList.remove('locked');
+            const b = document.getElementById(`block-q${i}`);
+            if(b) b.classList.remove('locked');
         }
 
         const q2Val = getVal('q2');
-
-        // BBS Rule: Q2=4 -> Q3 is 4 & Locked
         if (q2Val === 4) setAndLock('q3', 4);
-
-        // Rule: Q2=0 -> Q6-14 are 0 & Locked
         if (q2Val === 0) {
             for (let i = 6; i <= 14; i++) setAndLock('q'+i, 0);
         }
-
         updateTotal();
     }
 
     function setAndLock(name, val) {
         const radios = document.getElementsByName(name);
         radios.forEach(r => r.checked = (parseInt(r.value) === val));
-        document.getElementById(block-${name}).classList.add('locked');
+        const block = document.getElementById(`block-${name}`);
+        if(block) block.classList.add('locked');
     }
 
     function getVal(name) {
-        const r = document.querySelector(input[name="${name}"]:checked);
+        const r = document.querySelector(`input[name="${name}"]:checked`);
         return r ? parseInt(r.value) : null;
     }
 
@@ -258,17 +272,15 @@
         }
 
         document.getElementById('total-score').innerText = total;
-
         const riskBadge = document.getElementById('risk-status');
         const incompleteMsg = document.getElementById('incomplete-msg');
         
-        // Handle Interpretation and Warnings
         if(answeredCount < 14) {
             riskBadge.innerText = "Incomplete Assessment";
             riskBadge.style.backgroundColor = "#bdc3c7";
             incompleteMsg.innerText = "Please answer items: " + missingItems.join(", ");
         } else {
-            incompleteMsg.innerText = ""; // Clear warning
+            incompleteMsg.innerText = "";
             if (total >= 41) {
                 riskBadge.innerText = "Low Fall Risk";
                 riskBadge.style.backgroundColor = "var(--risk-low)";
@@ -289,6 +301,9 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
+
+    // RUN ON LOAD
+    window.onload = buildForm;
 </script>
 
 </body>
