@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBS Clinical Tool | PT Dept</title>
+    <title>BBS Clinical Tool</title>
     <style>
         :root {
             --ha-blue: #007b85; 
@@ -20,13 +20,12 @@
             font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-light);
             color: var(--text-main);
-            margin: 0;
-            padding: 10px;
+            margin: 0; padding: 10px;
         }
 
         .calculator-card {
             max-width: 700px;
-            margin: 0 auto 180px auto; 
+            margin: 0 auto 200px auto; 
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -40,32 +39,29 @@
             text-align: center;
         }
 
-        .header h1 { margin: 0; font-size: 1.3rem; }
-
         .item-container { padding: 15px; }
 
         .question-block {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: #fff;
         }
 
+        /* The Visual "Locked" State */
         .question-block.locked {
             background-color: var(--locked-bg);
-            opacity: 0.7;
-            pointer-events: none;
+            opacity: 0.6;
+            pointer-events: none; /* Prevents clicking */
         }
 
         .question-label {
             font-weight: 800;
-            font-size: 1.1rem;
             color: var(--ha-blue);
             display: block;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
         }
 
         .options-list { display: flex; flex-direction: column; gap: 8px; }
@@ -73,61 +69,50 @@
         .option-item {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            padding: 12px;
+            gap: 10px;
+            padding: 10px;
             border-radius: 6px;
             background: #f9f9f9;
             cursor: pointer;
-            border: 1px solid transparent;
         }
 
-        .option-item:hover { background: #f1f1f1; }
-        .option-item input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; }
-        .option-text { font-size: 0.95rem; line-height: 1.4; }
-        .score-badge { font-weight: bold; color: var(--ha-blue); margin-right: 5px; }
+        .option-item input { width: 20px; height: 20px; flex-shrink: 0; }
+        .score-badge { font-weight: bold; color: var(--ha-blue); }
 
-        /* Results Footer */
+        /* Sticky Footer */
         .results-footer {
             position: fixed;
             bottom: 0; left: 0; right: 0;
             background: white;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
             padding: 15px;
             text-align: center;
-            z-index: 9999;
+            z-index: 999;
             border-top: 4px solid var(--ha-blue);
         }
 
-        .score-row { font-size: 1.6rem; font-weight: 900; margin-bottom: 5px; color: var(--text-main); }
+        .score-display { font-size: 1.6rem; font-weight: bold; margin-bottom: 5px; }
         
-        .risk-status {
+        .risk-badge {
             display: inline-block;
-            padding: 6px 20px;
-            border-radius: 25px;
+            padding: 5px 20px;
+            border-radius: 20px;
             color: white;
-            font-size: 1.1rem;
             font-weight: bold;
             background-color: #bdc3c7;
             margin-bottom: 10px;
         }
 
-        .incomplete-warning {
-            color: #d63031;
-            font-size: 0.85rem;
-            font-weight: bold;
-            min-height: 1.2em;
-            margin-bottom: 10px;
-        }
+        .missing-alert { color: #d63031; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; }
 
-        .action-btns { display: flex; gap: 10px; justify-content: center; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; }
 
         button {
-            padding: 12px 24px;
+            padding: 10px 25px;
             border: none;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 0.9rem;
         }
 
         .btn-reset { background: #636e72; color: white; }
@@ -139,162 +124,147 @@
 <div class="calculator-card">
     <div class="header">
         <h1>Berg Balance Scale (BBS)</h1>
-        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional E-Doc Outcome Tool</p>
     </div>
 
     <div class="item-container">
         <form id="bbsForm">
-            <div class="question-block" id="block-q1">
-                <span class="question-label">1. Sitting to standing</span>
+            <div class="question-block" id="block-q1"><span class="question-label">1. Sitting to standing</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q1" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to stand without hands; independent</span></label>
-                    <label class="option-item"><input type="radio" name="q1" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Independent with hands</span></label>
-                    <label class="option-item"><input type="radio" name="q1" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Independent using hands after several tries</span></label>
-                    <label class="option-item"><input type="radio" name="q1" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs minimal assist to stand/stabilize</span></label>
-                    <label class="option-item"><input type="radio" name="q1" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs moderate/maximal assist</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="4"> <span><span class="score-badge">4:</span> Independent</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="3"> <span><span class="score-badge">3:</span> Independent with hands</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="2"> <span><span class="score-badge">2:</span> Independent with several tries</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="1"> <span><span class="score-badge">1:</span> Needs minimal assist</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="0"> <span><span class="score-badge">0:</span> Needs mod/max assist</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q2">
-                <span class="question-label">2. Standing unsupported (2 min)</span>
+            <div class="question-block" id="block-q2"><span class="question-label">2. Standing unsupported (2 min)</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q2" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to stand safely 2 mins</span></label>
-                    <label class="option-item"><input type="radio" name="q2" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to stand 2 mins with supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q2" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to stand 30 secs unsupported</span></label>
-                    <label class="option-item"><input type="radio" name="q2" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs several tries to stand 30 secs unsupported</span></label>
-                    <label class="option-item"><input type="radio" name="q2" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Unable to stand 30 secs unassisted</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="4"> <span><span class="score-badge">4:</span> Safe 2 mins</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="3"> <span><span class="score-badge">3:</span> 2 mins with supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="2"> <span><span class="score-badge">2:</span> 30 secs unsupported</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="1"> <span><span class="score-badge">1:</span> Needs tries for 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="0"> <span><span class="score-badge">0:</span> Unable 30 secs</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q3">
-                <span class="question-label">3. Sitting back unsupported (2 min)</span>
+            <div class="question-block" id="block-q3"><span class="question-label">3. Sitting back unsupported</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q3" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Safe/secure for 2 mins</span></label>
-                    <label class="option-item"><input type="radio" name="q3" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to sit 2 mins under supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q3" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to sit 30 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q3" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Able to sit 10 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q3" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Unable to sit without support 10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="4"> <span><span class="score-badge">4:</span> Safe 2 mins</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="3"> <span><span class="score-badge">3:</span> 2 mins supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="2"> <span><span class="score-badge">2:</span> 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="1"> <span><span class="score-badge">1:</span> 10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="0"> <span><span class="score-badge">0:</span> Unable without support</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q4">
-                <span class="question-label">4. Standing to sitting</span>
+            <div class="question-block" id="block-q4"><span class="question-label">4. Standing to sitting</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q4" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Sits safely with minimal use of hands</span></label>
-                    <label class="option-item"><input type="radio" name="q4" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Controls descent using hands</span></label>
-                    <label class="option-item"><input type="radio" name="q4" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Uses back of legs against chair to control descent</span></label>
-                    <label class="option-item"><input type="radio" name="q4" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Sits independently but has uncontrolled descent</span></label>
-                    <label class="option-item"><input type="radio" name="q4" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs assist to sit</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="4"> <span><span class="score-badge">4:</span> Sits safely</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="3"> <span><span class="score-badge">3:</span> Controls descent with hands</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="2"> <span><span class="score-badge">2:</span> Uses legs against chair</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="1"> <span><span class="score-badge">1:</span> Uncontrolled descent</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="0"> <span><span class="score-badge">0:</span> Needs assist</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q5">
-                <span class="question-label">5. Transfers (Pivot)</span>
+            <div class="question-block" id="block-q5"><span class="question-label">5. Transfers</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q5" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to transfer safely with minor use of hands</span></label>
-                    <label class="option-item"><input type="radio" name="q5" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to transfer safely definite need of hands</span></label>
-                    <label class="option-item"><input type="radio" name="q5" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to transfer with verbal cueing/supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q5" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs one person to assist</span></label>
-                    <label class="option-item"><input type="radio" name="q5" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs two people to assist/supervise</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="4"> <span><span class="score-badge">4:</span> Safe with minor hands</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="3"> <span><span class="score-badge">3:</span> Safe definite hands</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="2"> <span><span class="score-badge">2:</span> Verbal cue/supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="1"> <span><span class="score-badge">1:</span> Needs 1 person assist</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="0"> <span><span class="score-badge">0:</span> Needs 2 people assist</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q6">
-                <span class="question-label">6. Standing eyes closed (10 sec)</span>
+            <div class="question-block" id="block-q6"><span class="question-label">6. Standing eyes closed</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q6" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to stand 10 secs safely</span></label>
-                    <label class="option-item"><input type="radio" name="q6" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to stand 10 secs with supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q6" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to stand 3 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q6" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Unable to keep eyes closed 3 secs but stays safe</span></label>
-                    <label class="option-item"><input type="radio" name="q6" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs help to keep from falling</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="4"> <span><span class="score-badge">4:</span> 10 secs safely</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="3"> <span><span class="score-badge">3:</span> 10 secs supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="2"> <span><span class="score-badge">2:</span> 3 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="1"> <span><span class="score-badge">1:</span> Unable 3s but safe</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="0"> <span><span class="score-badge">0:</span> Needs help to not fall</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q7">
-                <span class="question-label">7. Standing feet together</span>
+            <div class="question-block" id="block-q7"><span class="question-label">7. Standing feet together</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q7" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to place feet together independently and stand 1 min safely</span></label>
-                    <label class="option-item"><input type="radio" name="q7" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to place feet together independently and stand 1 min with supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q7" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to place feet together independently but unable to hold for 30 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q7" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs help to attain position but able to stand 15 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q7" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs help to attain position and unable to hold for 15 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="4"> <span><span class="score-badge">4:</span> Independent 1 min</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="3"> <span><span class="score-badge">3:</span> Supervision 1 min</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="2"> <span><span class="score-badge">2:</span> Independent < 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="1"> <span><span class="score-badge">1:</span> Needs help to position</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="0"> <span><span class="score-badge">0:</span> Needs help and unable 15s</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q8">
-                <span class="question-label">8. Reaching forward</span>
+            <div class="question-block" id="block-q8"><span class="question-label">8. Reaching forward</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q8" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Can reach forward confidently >25 cm (10 in)</span></label>
-                    <label class="option-item"><input type="radio" name="q8" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Can reach forward >12 cm (5 in)</span></label>
-                    <label class="option-item"><input type="radio" name="q8" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Can reach forward >5 cm (2 in)</span></label>
-                    <label class="option-item"><input type="radio" name="q8" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Reaches forward but needs supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q8" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Loses balance while trying/needs external support</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="4"> <span><span class="score-badge">4:</span> > 25 cm</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="3"> <span><span class="score-badge">3:</span> > 12.5 cm</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="2"> <span><span class="score-badge">2:</span> > 5 cm</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="1"> <span><span class="score-badge">1:</span> Supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="0"> <span><span class="score-badge">0:</span> Loses balance</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q9">
-                <span class="question-label">9. Pick up object from floor</span>
+            <div class="question-block" id="block-q9"><span class="question-label">9. Pick up from floor</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q9" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to pick up slipper safely and easily</span></label>
-                    <label class="option-item"><input type="radio" name="q9" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to pick up slipper but needs supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q9" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Unable to pick up but reaches 2-5cm (1-2 in) from slipper independently</span></label>
-                    <label class="option-item"><input type="radio" name="q9" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Unable to pick up and needs supervision while trying</span></label>
-                    <label class="option-item"><input type="radio" name="q9" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Unable to try/needs assist to keep from falling</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="4"> <span><span class="score-badge">4:</span> Easy/Safe</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="3"> <span><span class="score-badge">3:</span> Supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="2"> <span><span class="score-badge">2:</span> Reaches 2-5cm from floor</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="1"> <span><span class="score-badge">1:</span> Supervision while trying</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="0"> <span><span class="score-badge">0:</span> Unable/Needs assist</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q10">
-                <span class="question-label">10. Turning to look behind</span>
+            <div class="question-block" id="block-q10"><span class="question-label">10. Turning to look behind</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q10" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Looks behind from both sides and weight shifts well</span></label>
-                    <label class="option-item"><input type="radio" name="q10" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Looks behind one side only; other side shows less weight shift</span></label>
-                    <label class="option-item"><input type="radio" name="q10" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Turns sideways only but maintains balance</span></label>
-                    <label class="option-item"><input type="radio" name="q10" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs supervision when turning</span></label>
-                    <label class="option-item"><input type="radio" name="q10" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs assist to keep from falling</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="4"> <span><span class="score-badge">4:</span> Looks both sides well</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="3"> <span><span class="score-badge">3:</span> One side only</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="2"> <span><span class="score-badge">2:</span> Sideways only</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="1"> <span><span class="score-badge">1:</span> Supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="0"> <span><span class="score-badge">0:</span> Needs assist</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q11">
-                <span class="question-label">11. Turn 360 degrees</span>
+            <div class="question-block" id="block-q11"><span class="question-label">11. Turn 360 degrees</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q11" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to turn 360 degrees safely in 4 secs or less</span></label>
-                    <label class="option-item"><input type="radio" name="q11" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to turn 360 degrees safely one side only in 4 secs or less</span></label>
-                    <label class="option-item"><input type="radio" name="q11" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to turn 360 degrees safely but slowly</span></label>
-                    <label class="option-item"><input type="radio" name="q11" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs close supervision or verbal cueing</span></label>
-                    <label class="option-item"><input type="radio" name="q11" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs assistance while turning</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="4"> <span><span class="score-badge">4:</span> < 4 secs safely</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="3"> <span><span class="score-badge">3:</span> < 4 secs one side only</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="2"> <span><span class="score-badge">2:</span> Safe but slow</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="1"> <span><span class="score-badge">1:</span> Close supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="0"> <span><span class="score-badge">0:</span> Needs assist</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q12">
-                <span class="question-label">12. Stool Stepping (8 times)</span>
+            <div class="question-block" id="block-q12"><span class="question-label">12. Stool stepping</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q12" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to stand independently and safely and complete 8 steps in 20 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q12" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to stand independently and complete 8 steps in >20 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q12" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to complete 4 steps without assistance with supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q12" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Able to complete >2 steps needs minimal assist</span></label>
-                    <label class="option-item"><input type="radio" name="q12" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs assistance to keep from falling/unable to try</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="4"> <span><span class="score-badge">4:</span> 8 steps in 20s</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="3"> <span><span class="score-badge">3:</span> 8 steps in > 20s</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="2"> <span><span class="score-badge">2:</span> 4 steps supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="1"> <span><span class="score-badge">1:</span> > 2 steps minimal assist</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="0"> <span><span class="score-badge">0:</span> Needs assist</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q13">
-                <span class="question-label">13. Tandem Standing (30 sec)</span>
+            <div class="question-block" id="block-q13"><span class="question-label">13. Tandem standing</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q13" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to place foot tandem independently and hold 30 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q13" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to place foot ahead of other independently and hold 30 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q13" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to take small step independently and hold 30 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q13" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs help to step but can hold 15 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q13" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Loses balance while stepping or standing</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="4"> <span><span class="score-badge">4:</span> 30 secs tandem</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="3"> <span><span class="score-badge">3:</span> 30 secs foot ahead</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="2"> <span><span class="score-badge">2:</span> 30 secs small step</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="1"> <span><span class="score-badge">1:</span> Needs help for 15s</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="0"> <span><span class="score-badge">0:</span> Loses balance</span></label>
                 </div>
             </div>
 
-            <div class="question-block" id="block-q14">
-                <span class="question-label">14. Standing on one leg</span>
+            <div class="question-block" id="block-q14"><span class="question-label">14. Stand one leg</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q14" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to lift leg independently and hold >10 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q14" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to lift leg independently and hold 5-10 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q14" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to lift leg independently and hold ≥3 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q14" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Tries to lift leg; unable to hold 3 secs but remains independent</span></label>
-                    <label class="option-item"><input type="radio" name="q14" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Unable to try or needs assist to prevent fall</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="4"> <span><span class="score-badge">4:</span> > 10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="3"> <span><span class="score-badge">3:</span> 5-10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="2"> <span><span class="score-badge">2:</span> >= 3 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="1"> <span><span class="score-badge">1:</span> Unable 3s but independent</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="0"> <span><span class="score-badge">0:</span> Unable/Needs assist</span></label>
                 </div>
             </div>
         </form>
@@ -302,75 +272,70 @@
 </div>
 
 <div class="results-footer">
-    <div class="score-row">Total: <span id="total-score">0</span> / 56</div>
-    <div id="risk-status" class="risk-status" style="background-color:#bdc3c7;">Awaiting Data</div>
-    <div id="incomplete-msg" class="incomplete-warning"></div>
-    
-    <div class="action-btns">
-        <button type="button" class="btn-reset" onclick="resetForm()">Reset</button>
-        <button type="button" class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Back to Home</button>
+    <div class="score-display">Total: <span id="total-val">0</span> / 56</div>
+    <div id="risk-txt" class="risk-badge">Awaiting Data</div>
+    <div id="missing-txt" class="missing-alert"></div>
+    <div class="btn-group">
+        <button class="btn-reset" onclick="hardReset()">Reset All</button>
+        <button class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Home</button>
     </div>
 </div>
 
 <script>
-    function runLogic() {
-        const q2 = getVal('q2');
+    const form = document.getElementById('bbsForm');
 
-        // Logic 1: Reset Q3 Lock state
+    // Add event listeners to all radios
+    form.addEventListener('change', () => {
+        applyClinicalRules();
+        calculateResult();
+    });
+
+    function applyClinicalRules() {
+        const q2 = getVal('q2');
         const block3 = document.getElementById('block-q3');
+
+        // Logic 1: Reset Q3 lock state every time logic runs
         block3.classList.remove('locked');
 
-        // Logic 2: If Q2=4, Q3 becomes 4 and LOCKS (2-minute rule)
+        // Logic 2: Q2 = 4 -> Auto-select Q3(4) and LOCK
         if (q2 === 4) {
-            setScore('q3', 4);
+            setRadio('q3', 4);
             block3.classList.add('locked');
         }
 
-        // Logic 3: If Q2=0, auto-zero 6-14 (Inability to stand)
+        // Logic 3: Q2 = 0 -> Auto-select Q6-14 (0) but NO LOCK
         if (q2 === 0) {
             for (let i = 6; i <= 14; i++) {
-                setScore('q' + i, 0);
+                setRadio('q' + i, 0);
             }
         }
-
-        updateDisplay();
     }
 
-    function setScore(name, val) {
-        const radios = document.getElementsByName(name);
-        radios.forEach(r => { if (parseInt(r.value) === val) r.checked = true; });
-    }
-
-    function getVal(name) {
-        const r = document.querySelector(input[name="${name}"]:checked);
-        return r ? parseInt(r.value) : null;
-    }
-
-    function updateDisplay() {
+    function calculateResult() {
         let total = 0;
         let answered = 0;
         let missing = [];
 
         for (let i = 1; i <= 14; i++) {
-            const v = getVal('q' + i);
-            if (v !== null) {
-                total += v;
+            const val = getVal('q' + i);
+            if (val !== null) {
+                total += val;
                 answered++;
             } else {
                 missing.push(i);
             }
         }
 
-        document.getElementById('total-score').innerText = total;
-        const risk = document.getElementById('risk-status');
-        const warn = document.getElementById('incomplete-msg');
+        document.getElementById('total-val').innerText = total;
+        const risk = document.getElementById('risk-txt');
+        const alert = document.getElementById('missing-txt');
 
         if (answered < 14) {
-            risk.innerText = "Assessment Incomplete";
+            risk.innerText = "Incomplete";
             risk.style.backgroundColor = "#bdc3c7";
-            warn.innerText = "Please answer items: " + missing.join(", ");
+            alert.innerText = "Missing items: " + missing.join(", ");
         } else {
-            warn.innerText = "";
+            alert.innerText = "";
             if (total >= 41) {
                 risk.innerText = "Low Fall Risk (41-56)";
                 risk.style.backgroundColor = "var(--risk-low)";
@@ -384,16 +349,29 @@
         }
     }
 
-    function resetForm() {
-        if (confirm("Reset assessment?")) {
-            document.getElementById('bbsForm').reset();
-            runLogic();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Helpers
+    function getVal(name) {
+        const el = document.querySelector(input[name="${name}"]:checked);
+        return el ? parseInt(el.value) : null;
+    }
+
+    function setRadio(name, val) {
+        const radios = document.getElementsByName(name);
+        radios.forEach(r => { if(parseInt(r.value) === val) r.checked = true; });
+    }
+
+    function hardReset() {
+        if(confirm("Clear all data?")) {
+            form.reset();
+            // Remove locks manually
+            document.querySelectorAll('.question-block').forEach(b => b.classList.remove('locked'));
+            calculateResult();
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
     }
 
-    // Run once on load to initialize footer state
-    window.onload = updateDisplay;
+    // Initialize display on load
+    window.onload = calculateResult;
 </script>
 
 </body>
