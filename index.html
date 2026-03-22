@@ -31,7 +31,6 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
-            display: block !important;
         }
 
         .header {
@@ -43,7 +42,7 @@
 
         .header h1 { margin: 0; font-size: 1.3rem; }
 
-        .item-container { padding: 15px; min-height: 300px; }
+        .item-container { padding: 15px; }
 
         .question-block {
             margin-bottom: 25px;
@@ -83,7 +82,7 @@
         }
 
         .option-item:hover { background: #f1f1f1; }
-        .option-item input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; cursor: pointer; }
+        .option-item input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; }
         .option-text { font-size: 0.95rem; line-height: 1.4; }
         .score-badge { font-weight: bold; color: var(--ha-blue); margin-right: 5px; }
 
@@ -133,13 +132,6 @@
 
         .btn-reset { background: #636e72; color: white; }
         .btn-home { background: var(--ha-blue); color: white; }
-
-        #load-error-btn {
-            display: none;
-            margin: 20px auto;
-            background: #e67e22;
-            color: white;
-        }
     </style>
 </head>
 <body>
@@ -147,15 +139,163 @@
 <div class="calculator-card">
     <div class="header">
         <h1>Berg Balance Scale (BBS)</h1>
-        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional Clinical Toolkit</p>
+        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional E-Doc Outcome Tool</p>
     </div>
-
-    <button id="load-error-btn" onclick="buildForm()">Items missing? Click to Force Load</button>
 
     <div class="item-container">
         <form id="bbsForm">
-            <div id="questions-list">
-                <p style="text-align:center; padding:50px; color:#636e72;">Initializing Assessment items...</p>
+            <div class="question-block" id="block-q1">
+                <span class="question-label">1. Sitting to standing</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q1" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to stand without hands; independent</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Independent with hands</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Independent using hands after several tries</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs minimal assist to stand/stabilize</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs moderate/maximal assist</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q2">
+                <span class="question-label">2. Standing unsupported (2 min)</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q2" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to stand safely 2 mins</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to stand 2 mins with supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to stand 30 secs unsupported</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs several tries to stand 30 secs unsupported</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Unable to stand 30 secs unassisted</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q3">
+                <span class="question-label">3. Sitting back unsupported (2 min)</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q3" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Safe/secure for 2 mins</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to sit 2 mins under supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to sit 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Able to sit 10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Unable to sit without support 10 secs</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q4">
+                <span class="question-label">4. Standing to sitting</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q4" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Sits safely with minimal use of hands</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Controls descent using hands</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Uses back of legs against chair to control descent</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Sits independently but has uncontrolled descent</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs assist to sit</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q5">
+                <span class="question-label">5. Transfers (Pivot)</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q5" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to transfer safely with minor use of hands</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to transfer safely definite need of hands</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to transfer with verbal cueing/supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs one person to assist</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs two people to assist/supervise</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q6">
+                <span class="question-label">6. Standing eyes closed (10 sec)</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q6" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to stand 10 secs safely</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to stand 10 secs with supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to stand 3 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Unable to keep eyes closed 3 secs but stays safe</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs help to keep from falling</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q7">
+                <span class="question-label">7. Standing feet together</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q7" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to place feet together independently and stand 1 min safely</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to place feet together independently and stand 1 min with supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to place feet together independently but unable to hold for 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs help to attain position but able to stand 15 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs help to attain position and unable to hold for 15 secs</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q8">
+                <span class="question-label">8. Reaching forward</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q8" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Can reach forward confidently >25 cm (10 in)</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Can reach forward >12 cm (5 in)</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Can reach forward >5 cm (2 in)</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Reaches forward but needs supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Loses balance while trying/needs external support</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q9">
+                <span class="question-label">9. Pick up object from floor</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q9" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to pick up slipper safely and easily</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to pick up slipper but needs supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Unable to pick up but reaches 2-5cm (1-2 in) from slipper independently</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Unable to pick up and needs supervision while trying</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Unable to try/needs assist to keep from falling</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q10">
+                <span class="question-label">10. Turning to look behind</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q10" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Looks behind from both sides and weight shifts well</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Looks behind one side only; other side shows less weight shift</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Turns sideways only but maintains balance</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs supervision when turning</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs assist to keep from falling</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q11">
+                <span class="question-label">11. Turn 360 degrees</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q11" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to turn 360 degrees safely in 4 secs or less</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to turn 360 degrees safely one side only in 4 secs or less</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to turn 360 degrees safely but slowly</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs close supervision or verbal cueing</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs assistance while turning</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q12">
+                <span class="question-label">12. Stool Stepping (8 times)</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q12" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to stand independently and safely and complete 8 steps in 20 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to stand independently and complete 8 steps in >20 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to complete 4 steps without assistance with supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Able to complete >2 steps needs minimal assist</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Needs assistance to keep from falling/unable to try</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q13">
+                <span class="question-label">13. Tandem Standing (30 sec)</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q13" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to place foot tandem independently and hold 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to place foot ahead of other independently and hold 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to take small step independently and hold 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Needs help to step but can hold 15 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Loses balance while stepping or standing</span></label>
+                </div>
+            </div>
+
+            <div class="question-block" id="block-q14">
+                <span class="question-label">14. Standing on one leg</span>
+                <div class="options-list">
+                    <label class="option-item"><input type="radio" name="q14" value="4" onchange="runLogic()"><span class="option-text"><span class="score-badge">4:</span> Able to lift leg independently and hold >10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="3" onchange="runLogic()"><span class="option-text"><span class="score-badge">3:</span> Able to lift leg independently and hold 5-10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="2" onchange="runLogic()"><span class="option-text"><span class="score-badge">2:</span> Able to lift leg independently and hold ≥3 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="1" onchange="runLogic()"><span class="option-text"><span class="score-badge">1:</span> Tries to lift leg; unable to hold 3 secs but remains independent</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="0" onchange="runLogic()"><span class="option-text"><span class="score-badge">0:</span> Unable to try or needs assist to prevent fall</span></label>
+                </div>
             </div>
         </form>
     </div>
@@ -163,85 +303,37 @@
 
 <div class="results-footer">
     <div class="score-row">Total: <span id="total-score">0</span> / 56</div>
-    <div id="risk-status" class="risk-status">Awaiting Data</div>
+    <div id="risk-status" class="risk-status" style="background-color:#bdc3c7;">Awaiting Data</div>
     <div id="incomplete-msg" class="incomplete-warning"></div>
     
     <div class="action-btns">
-        <button type="button" class="btn-reset" onclick="resetCalculator()">Reset Form</button>
+        <button type="button" class="btn-reset" onclick="resetForm()">Reset</button>
         <button type="button" class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Back to Home</button>
     </div>
 </div>
 
 <script>
-    // Complete BBS Item Content
-    const bbsData = [
-        { name: "Sitting to standing", criteria: ["Able to stand without hands; independent", "Independent with hands", "Independent using hands after several tries", "Needs minimal assist to stand/stabilize", "Needs moderate/maximal assist"] },
-        { name: "Standing unsupported (2 min)", criteria: ["Able to stand safely 2 mins", "Able to stand 2 mins with supervision", "Able to stand 30 secs unsupported", "Needs several tries to stand 30 secs unsupported", "Unable to stand 30 secs unassisted"] },
-        { name: "Sitting back unsupported (2 min)", criteria: ["Safe/secure for 2 mins", "Able to sit 2 mins under supervision", "Able to sit 30 secs", "Able to sit 10 secs", "Unable to sit without support 10 secs"] },
-        { name: "Standing to sitting", criteria: ["Sits safely with minimal use of hands", "Controls descent using hands", "Uses back of legs against chair to control descent", "Sits independently but has uncontrolled descent", "Needs assist to sit"] },
-        { name: "Transfers (Pivot)", criteria: ["Able to transfer safely with minor use of hands", "Able to transfer safely definite need of hands", "Able to transfer with verbal cueing/supervision", "Needs one person to assist", "Needs two people to assist/supervise"] },
-        { name: "Standing eyes closed (10 sec)", criteria: ["Able to stand 10 secs safely", "Able to stand 10 secs with supervision", "Able to stand 3 secs", "Unable to keep eyes closed 3 secs but stays safe", "Needs help to keep from falling"] },
-        { name: "Standing feet together", criteria: ["Able to place feet together independently and stand 1 min safely", "Able to place feet together independently and stand 1 min with supervision", "Able to place feet together independently but unable to hold for 30 secs", "Needs help to attain position but able to stand 15 secs", "Needs help to attain position and unable to hold for 15 secs"] },
-        { name: "Reaching forward", criteria: ["Can reach forward confidently >25 cm (10 in)", "Can reach forward >12 cm (5 in)", "Can reach forward >5 cm (2 in)", "Reaches forward but needs supervision", "Loses balance while trying/needs external support"] },
-        { name: "Pick up object from floor", criteria: ["Able to pick up slipper safely and easily", "Able to pick up slipper but needs supervision", "Unable to pick up but reaches 2-5cm (1-2 in) from slipper independently", "Unable to pick up and needs supervision while trying", "Unable to try/needs assist to keep from falling"] },
-        { name: "Turning to look behind", criteria: ["Looks behind from both sides and weight shifts well", "Looks behind one side only; other side shows less weight shift", "Turns sideways only but maintains balance", "Needs supervision when turning", "Needs assist to keep from falling"] },
-        { name: "Turn 360 degrees", criteria: ["Able to turn 360 degrees safely in 4 secs or less", "Able to turn 360 degrees safely one side only in 4 secs or less", "Able to turn 360 degrees safely but slowly", "Needs close supervision or verbal cueing", "Needs assistance while turning"] },
-        { name: "Stool Stepping (8 times)", criteria: ["Able to stand independently and safely and complete 8 steps in 20 secs", "Able to stand independently and complete 8 steps in >20 secs", "Able to complete 4 steps without assistance with supervision", "Able to complete >2 steps needs minimal assist", "Needs assistance to keep from falling/unable to try"] },
-        { name: "Tandem Standing (30 sec)", criteria: ["Able to place foot tandem independently and hold 30 secs", "Able to place foot ahead of other independently and hold 30 secs", "Able to take small step independently and hold 30 secs", "Needs help to step but can hold 15 secs", "Loses balance while stepping or standing"] },
-        { name: "Standing on one leg", criteria: ["Able to lift leg independently and hold >10 secs", "Able to lift leg independently and hold 5-10 secs", "Able to lift leg independently and hold ≥3 secs", "Tries to lift leg; unable to hold 3 secs but remains independent", "Unable to try or needs assist to prevent fall"] }
-    ];
+    function runLogic() {
+        const q2 = getVal('q2');
 
-    function buildForm() {
-        const list = document.getElementById('questions-list');
-        if(!list) return;
-        
-        list.innerHTML = ""; 
-        document.getElementById('load-error-btn').style.display = 'none';
+        // Logic 1: Reset Q3 Lock state
+        const block3 = document.getElementById('block-q3');
+        block3.classList.remove('locked');
 
-        bbsData.forEach((item, i) => {
-            const qNum = i + 1;
-            const block = document.createElement('div');
-            block.className = 'question-block';
-            block.id = block-q${qNum};
-
-            const optionsHtml = item.criteria.map((text, index) => {
-                const score = 4 - index;
-                return `
-                    <label class="option-item">
-                        <input type="radio" name="q${qNum}" value="${score}" onchange="applyClinicalLogic()">
-                        <span class="option-text"><span class="score-badge">${score}:</span> ${text}</span>
-                    </label>
-                `;
-            }).join('');
-
-            block.innerHTML = `
-                <span class="question-label">${qNum}. ${item.name}</span>
-                <div class="options-list">${optionsHtml}</div>
-            `;
-            list.appendChild(block);
-        });
-        updateTotal();
-    }
-
-    function applyClinicalLogic() {
-        // Unlock Q3 first (Standard cleanup)
-        document.getElementById('block-q3').classList.remove('locked');
-
-        const q2Val = getVal('q2');
-
-        // Logic A: Q2 is 4 -> Q3 becomes 4 and LOCKS
-        if (q2Val === 4) {
+        // Logic 2: If Q2=4, Q3 becomes 4 and LOCKS (2-minute rule)
+        if (q2 === 4) {
             setScore('q3', 4);
-            document.getElementById('block-q3').classList.add('locked');
+            block3.classList.add('locked');
         }
 
-        // Logic B: Q2 is 0 -> Q6 thru Q14 become 0 but UNLOCKED
-        if (q2Val === 0) {
+        // Logic 3: If Q2=0, auto-zero 6-14 (Inability to stand)
+        if (q2 === 0) {
             for (let i = 6; i <= 14; i++) {
                 setScore('q' + i, 0);
             }
         }
-        updateTotal();
+
+        updateDisplay();
     }
 
     function setScore(name, val) {
@@ -254,61 +346,54 @@
         return r ? parseInt(r.value) : null;
     }
 
-    function updateTotal() {
+    function updateDisplay() {
         let total = 0;
-        let answeredCount = 0;
+        let answered = 0;
         let missing = [];
 
         for (let i = 1; i <= 14; i++) {
-            const val = getVal('q' + i);
-            if (val !== null) {
-                total += val;
-                answeredCount++;
+            const v = getVal('q' + i);
+            if (v !== null) {
+                total += v;
+                answered++;
             } else {
                 missing.push(i);
             }
         }
 
         document.getElementById('total-score').innerText = total;
-        const riskBadge = document.getElementById('risk-status');
+        const risk = document.getElementById('risk-status');
         const warn = document.getElementById('incomplete-msg');
-        
-        if(answeredCount < 14) {
-            riskBadge.innerText = "Assessment Incomplete";
-            riskBadge.style.backgroundColor = "#bdc3c7";
-            warn.innerText = "Unanswered items: " + missing.join(", ");
+
+        if (answered < 14) {
+            risk.innerText = "Assessment Incomplete";
+            risk.style.backgroundColor = "#bdc3c7";
+            warn.innerText = "Please answer items: " + missing.join(", ");
         } else {
             warn.innerText = "";
             if (total >= 41) {
-                riskBadge.innerText = "Low Fall Risk (41-56)";
-                riskBadge.style.backgroundColor = "var(--risk-low)";
+                risk.innerText = "Low Fall Risk (41-56)";
+                risk.style.backgroundColor = "var(--risk-low)";
             } else if (total >= 21) {
-                riskBadge.innerText = "Medium Fall Risk (21-40)";
-                riskBadge.style.backgroundColor = "var(--risk-med)";
+                risk.innerText = "Medium Fall Risk (21-40)";
+                risk.style.backgroundColor = "var(--risk-med)";
             } else {
-                riskBadge.innerText = "High Fall Risk (0-20)";
-                riskBadge.style.backgroundColor = "var(--risk-high)";
+                risk.innerText = "High Fall Risk (0-20)";
+                risk.style.backgroundColor = "var(--risk-high)";
             }
         }
     }
 
-    function resetCalculator() {
-        if(confirm("Are you sure you want to clear all scores?")) {
+    function resetForm() {
+        if (confirm("Reset assessment?")) {
             document.getElementById('bbsForm').reset();
-            applyClinicalLogic();
+            runLogic();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
-    // Force build on load and display error button if it fails
-    window.addEventListener('load', () => {
-        buildForm();
-        setTimeout(() => {
-            if (document.getElementById('questions-list').children.length <= 1) {
-                document.getElementById('load-error-btn').style.display = 'block';
-            }
-        }, 1000);
-    });
+    // Run once on load to initialize footer state
+    window.onload = updateDisplay;
 </script>
 
 </body>
