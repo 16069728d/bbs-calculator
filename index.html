@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBS Clinical Tool | PT Dept</title>
+    <title>BBS Clinical Tool | HA PT Dept</title>
     <style>
         :root {
             --ha-blue: #007b85; 
@@ -78,7 +78,6 @@
             padding-bottom: 5px;
         }
 
-        /* Vertical Radio List */
         .options-list {
             display: flex;
             flex-direction: column;
@@ -89,14 +88,15 @@
             display: flex;
             align-items: flex-start;
             gap: 12px;
-            padding: 10px;
+            padding: 12px;
             border-radius: 6px;
             background: #f9f9f9;
             cursor: pointer;
             transition: background 0.2s;
+            border: 1px solid transparent;
         }
 
-        .option-item:hover { background: #f1f1f1; }
+        .option-item:hover { background: #f1f1f1; border-color: #ddd; }
 
         .option-item input {
             width: 20px;
@@ -133,15 +133,18 @@
 
         button {
             flex: 1;
-            padding: 12px;
+            padding: 14px;
             border: none;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s;
         }
 
         .btn-reset { background: #636e72; color: white; }
         .btn-home { background: var(--ha-blue); color: white; }
+        button:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -149,11 +152,11 @@
 <div class="calculator-card">
     <div class="header">
         <h1>Berg Balance Scale (BBS)</h1>
-        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Standardized Scoring Guide</p>
+        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional E-Doc Outcome Tool</p>
     </div>
 
     <div class="score-banner">
-        Total Score: <span id="total-score">0</span> / 56
+        Total BBS Score: <span id="total-score">0</span> / 56
     </div>
 
     <div class="item-container">
@@ -164,7 +167,7 @@
 
     <div class="footer-btns">
         <button type="button" class="btn-reset" onclick="resetCalculator()">Reset All</button>
-        <button type="button" class="btn-home" onclick="location.reload()">Refresh Page</button>
+        <button type="button" class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Back to Home</button>
     </div>
 </div>
 
@@ -194,7 +197,6 @@
             block.className = 'question-block';
             block.id = `block-q${qNum}`;
 
-            // We generate scores 4 down to 0
             const optionsHtml = item.criteria.map((text, index) => {
                 const score = 4 - index;
                 return `
@@ -208,24 +210,24 @@
             block.innerHTML = `
                 <span class="question-label">${qNum}. ${item.name}</span>
                 <div class="options-list">${optionsHtml}</div>
-                ${qNum === 2 ? '<span class="clinical-hint">BBS Logic: Score 4 auto-fills Item 3</span>' : ''}
+                ${qNum === 2 ? '<span class="clinical-hint">Official Protocol: Score 4 auto-fills Item 3</span>' : ''}
             `;
             list.appendChild(block);
         });
     });
 
     function applyClinicalLogic() {
-        const q2Val = getVal('q2');
-
-        // Reset all locks to fix the correction bug
+        // Reset all locks to fix correction state
         for (let i = 1; i <= 14; i++) {
             document.getElementById(`block-q${i}`).classList.remove('locked');
         }
 
-        // Rule 1: Q2=4 -> Q3 is 4 & Locked
+        const q2Val = getVal('q2');
+
+        // Logic 1: Q2=4 -> Q3 is 4 & Locked (2min standing rule)
         if (q2Val === 4) setAndLock('q3', 4);
 
-        // Rule 2: Q2=0 -> Q6-14 are 0 & Locked
+        // Logic 2: Q2=0 -> Q6-14 are 0 & Locked (Inability to stand)
         if (q2Val === 0) {
             for (let i = 6; i <= 14; i++) setAndLock('q'+i, 0);
         }
