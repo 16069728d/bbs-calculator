@@ -26,12 +26,11 @@
 
         .calculator-card {
             max-width: 700px;
-            margin: 0 auto 160px auto; 
+            margin: 0 auto 180px auto; 
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
-            display: block !important; /* Ensure visibility */
         }
 
         .header {
@@ -43,7 +42,7 @@
 
         .header h1 { margin: 0; font-size: 1.3rem; }
 
-        .item-container { padding: 15px; min-height: 200px; }
+        .item-container { padding: 15px; }
 
         .question-block {
             margin-bottom: 25px;
@@ -51,11 +50,13 @@
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: #fff;
+            transition: background 0.3s ease;
         }
 
+        /* Keep the visual cue for the locked Sitting item */
         .question-block.locked {
             background-color: var(--locked-bg);
-            opacity: 0.6;
+            opacity: 0.7;
             pointer-events: none;
         }
 
@@ -138,15 +139,6 @@
 
         .btn-reset { background: #636e72; color: white; }
         .btn-home { background: var(--ha-blue); color: white; }
-
-        #fix-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #999;
-            font-size: 0.7rem;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
@@ -159,17 +151,14 @@
 
     <div class="item-container">
         <form id="bbsForm">
-            <div id="questions-list">
-                <p style="text-align:center; padding:20px;">Loading assessment items...</p>
-            </div>
+            <div id="questions-list"></div>
         </form>
     </div>
-    <a href="#" id="fix-link" onclick="location.reload()">Items not showing? Click to refresh</a>
 </div>
 
 <div class="results-footer">
     <div class="score-row">Total Score: <span id="total-score">0</span> / 56</div>
-    <div id="risk-status" class="risk-badge" style="display:inline-block; padding:5px 15px; border-radius:20px; color:white; font-weight:bold; background-color:#bdc3c7;">Awaiting Input</div>
+    <div id="risk-status" class="risk-status">Awaiting Input</div>
     <div id="incomplete-msg" class="incomplete-warning"></div>
     
     <div class="action-btns">
@@ -179,7 +168,6 @@
 </div>
 
 <script>
-    // Data Array
     const bbsData = [
         { name: "Sitting to standing", criteria: ["Able to stand without hands; independent", "Independent with hands", "Independent using hands after several tries", "Needs minimal assist to stand/stabilize", "Needs moderate/maximal assist"] },
         { name: "Standing unsupported (2 min)", criteria: ["Able to stand safely 2 mins", "Able to stand 2 mins with supervision", "Able to stand 30 secs unsupported", "Needs several tries to stand 30 secs unsupported", "Unable to stand 30 secs unassisted"] },
@@ -197,18 +185,15 @@
         { name: "Standing on one leg", criteria: ["Able to lift leg independently and hold >10 secs", "Able to lift leg independently and hold 5-10 secs", "Able to lift leg independently and hold ≥3 secs", "Tries to lift leg; unable to hold 3 secs but remains independent", "Unable to try or needs assist to prevent fall"] }
     ];
 
-    // THE RENDER FUNCTION
     function buildForm() {
         const list = document.getElementById('questions-list');
-        if(!list) return;
-        
-        list.innerHTML = ""; // Clear the "Loading..." message
+        list.innerHTML = ""; 
 
         bbsData.forEach((item, i) => {
             const qNum = i + 1;
             const block = document.createElement('div');
             block.className = 'question-block';
-            block.id = `block-q${qNum}`;
+            block.id = block-q${qNum};
 
             const optionsHtml = item.criteria.map((text, index) => {
                 const score = 4 - index;
@@ -229,30 +214,38 @@
         updateTotal(); 
     }
 
-    // LOGIC FUNCTIONS
     function applyClinicalLogic() {
-        for (let i = 1; i <= 14; i++) {
-            const b = document.getElementById(`block-q${i}`);
-            if(b) b.classList.remove('locked');
-        }
+        // Clear only the "Sitting" lock (Q3)
+        document.getElementById('block-q3').classList.remove('locked');
 
         const q2Val = getVal('q2');
-        if (q2Val === 4) setAndLock('q3', 4);
-        if (q2Val === 0) {
-            for (let i = 6; i <= 14; i++) setAndLock('q'+i, 0);
+
+        // Rule: Q2=4 -> Q3 is 4 and LOCKED (Standard Clinical Protocol)
+        if (q2Val === 4) {
+            setScore('q3', 4);
+            document.getElementById('block-q3').classList.add('locked');
         }
+
+        // Rule: Q2=0 -> Auto-zero 6-14, but NO LOCKING (As requested)
+        if (q2Val === 0) {
+            for (let i = 6; i <= 14; i++) {
+                setScore('q' + i, 0);
+            }
+        }
+
         updateTotal();
     }
 
-    function setAndLock(name, val) {
+    // New helper to set score without locking
+    function setScore(name, val) {
         const radios = document.getElementsByName(name);
-        radios.forEach(r => r.checked = (parseInt(r.value) === val));
-        const block = document.getElementById(`block-${name}`);
-        if(block) block.classList.add('locked');
+        radios.forEach(r => {
+            if (parseInt(r.value) === val) r.checked = true;
+        });
     }
 
     function getVal(name) {
-        const r = document.querySelector(`input[name="${name}"]:checked`);
+        const r = document.querySelector(input[name="${name}"]:checked);
         return r ? parseInt(r.value) : null;
     }
 
@@ -276,9 +269,9 @@
         const incompleteMsg = document.getElementById('incomplete-msg');
         
         if(answeredCount < 14) {
-            riskBadge.innerText = "Incomplete Assessment";
+            riskBadge.innerText = "Incomplete";
             riskBadge.style.backgroundColor = "#bdc3c7";
-            incompleteMsg.innerText = "Please answer items: " + missingItems.join(", ");
+            incompleteMsg.innerText = "Missing items: " + missingItems.join(", ");
         } else {
             incompleteMsg.innerText = "";
             if (total >= 41) {
@@ -295,14 +288,13 @@
     }
 
     function resetCalculator() {
-        if(confirm("Clear all scores?")) {
+        if(confirm("Reset all items?")) {
             document.getElementById('bbsForm').reset();
             applyClinicalLogic();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
-    // RUN ON LOAD
     window.onload = buildForm;
 </script>
 
