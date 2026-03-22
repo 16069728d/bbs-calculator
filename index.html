@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBS Clinical Tool | HA PT Dept</title>
+    <title>BBS Clinical Tool | PT Dept</title>
     <style>
         :root {
             --ha-blue: #007b85; 
@@ -31,6 +31,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
+            display: block !important;
         }
 
         .header {
@@ -42,7 +43,7 @@
 
         .header h1 { margin: 0; font-size: 1.3rem; }
 
-        .item-container { padding: 15px; }
+        .item-container { padding: 15px; min-height: 300px; }
 
         .question-block {
             margin-bottom: 25px;
@@ -50,10 +51,8 @@
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: #fff;
-            transition: background 0.3s ease;
         }
 
-        /* Keep the visual cue for the locked Sitting item */
         .question-block.locked {
             background-color: var(--locked-bg);
             opacity: 0.7;
@@ -65,12 +64,12 @@
             font-size: 1.1rem;
             color: var(--ha-blue);
             display: block;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
         }
 
-        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .options-list { display: flex; flex-direction: column; gap: 8px; }
 
         .option-item {
             display: flex;
@@ -84,61 +83,63 @@
         }
 
         .option-item:hover { background: #f1f1f1; }
-        .option-item input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; }
+        .option-item input { width: 22px; height: 22px; margin-top: 2px; flex-shrink: 0; cursor: pointer; }
         .option-text { font-size: 0.95rem; line-height: 1.4; }
         .score-badge { font-weight: bold; color: var(--ha-blue); margin-right: 5px; }
 
-        /* Sticky Bottom Results Bar */
+        /* Results Footer */
         .results-footer {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             background: white;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
             padding: 15px;
             text-align: center;
-            z-index: 2000;
-            border-top: 3px solid var(--ha-blue);
+            z-index: 9999;
+            border-top: 4px solid var(--ha-blue);
         }
 
-        .score-row { font-size: 1.5rem; font-weight: bold; margin-bottom: 5px; }
+        .score-row { font-size: 1.6rem; font-weight: 900; margin-bottom: 5px; color: var(--text-main); }
         
         .risk-status {
             display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
+            padding: 6px 20px;
+            border-radius: 25px;
             color: white;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: bold;
             background-color: #bdc3c7;
+            margin-bottom: 10px;
         }
 
         .incomplete-warning {
             color: #d63031;
             font-size: 0.85rem;
             font-weight: bold;
-            margin-top: 8px;
             min-height: 1.2em;
+            margin-bottom: 10px;
         }
 
-        .action-btns {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
+        .action-btns { display: flex; gap: 10px; justify-content: center; }
 
         button {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
             border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 0.9rem;
         }
 
         .btn-reset { background: #636e72; color: white; }
         .btn-home { background: var(--ha-blue); color: white; }
+
+        #load-error-btn {
+            display: none;
+            margin: 20px auto;
+            background: #e67e22;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -146,28 +147,33 @@
 <div class="calculator-card">
     <div class="header">
         <h1>Berg Balance Scale (BBS)</h1>
-        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional Outcome Measure Tool</p>
+        <p style="margin:5px 0 0; font-size:0.8rem; opacity:0.9;">Professional Clinical Toolkit</p>
     </div>
+
+    <button id="load-error-btn" onclick="buildForm()">Items missing? Click to Force Load</button>
 
     <div class="item-container">
         <form id="bbsForm">
-            <div id="questions-list"></div>
+            <div id="questions-list">
+                <p style="text-align:center; padding:50px; color:#636e72;">Initializing Assessment items...</p>
+            </div>
         </form>
     </div>
 </div>
 
 <div class="results-footer">
-    <div class="score-row">Total Score: <span id="total-score">0</span> / 56</div>
-    <div id="risk-status" class="risk-status">Awaiting Input</div>
+    <div class="score-row">Total: <span id="total-score">0</span> / 56</div>
+    <div id="risk-status" class="risk-status">Awaiting Data</div>
     <div id="incomplete-msg" class="incomplete-warning"></div>
     
     <div class="action-btns">
-        <button type="button" class="btn-reset" onclick="resetCalculator()">Reset</button>
-        <button type="button" class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Home</button>
+        <button type="button" class="btn-reset" onclick="resetCalculator()">Reset Form</button>
+        <button type="button" class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Back to Home</button>
     </div>
 </div>
 
 <script>
+    // Complete BBS Item Content
     const bbsData = [
         { name: "Sitting to standing", criteria: ["Able to stand without hands; independent", "Independent with hands", "Independent using hands after several tries", "Needs minimal assist to stand/stabilize", "Needs moderate/maximal assist"] },
         { name: "Standing unsupported (2 min)", criteria: ["Able to stand safely 2 mins", "Able to stand 2 mins with supervision", "Able to stand 30 secs unsupported", "Needs several tries to stand 30 secs unsupported", "Unable to stand 30 secs unassisted"] },
@@ -187,7 +193,10 @@
 
     function buildForm() {
         const list = document.getElementById('questions-list');
+        if(!list) return;
+        
         list.innerHTML = ""; 
+        document.getElementById('load-error-btn').style.display = 'none';
 
         bbsData.forEach((item, i) => {
             const qNum = i + 1;
@@ -211,37 +220,33 @@
             `;
             list.appendChild(block);
         });
-        updateTotal(); 
+        updateTotal();
     }
 
     function applyClinicalLogic() {
-        // Clear only the "Sitting" lock (Q3)
+        // Unlock Q3 first (Standard cleanup)
         document.getElementById('block-q3').classList.remove('locked');
 
         const q2Val = getVal('q2');
 
-        // Rule: Q2=4 -> Q3 is 4 and LOCKED (Standard Clinical Protocol)
+        // Logic A: Q2 is 4 -> Q3 becomes 4 and LOCKS
         if (q2Val === 4) {
             setScore('q3', 4);
             document.getElementById('block-q3').classList.add('locked');
         }
 
-        // Rule: Q2=0 -> Auto-zero 6-14, but NO LOCKING (As requested)
+        // Logic B: Q2 is 0 -> Q6 thru Q14 become 0 but UNLOCKED
         if (q2Val === 0) {
             for (let i = 6; i <= 14; i++) {
                 setScore('q' + i, 0);
             }
         }
-
         updateTotal();
     }
 
-    // New helper to set score without locking
     function setScore(name, val) {
         const radios = document.getElementsByName(name);
-        radios.forEach(r => {
-            if (parseInt(r.value) === val) r.checked = true;
-        });
+        radios.forEach(r => { if (parseInt(r.value) === val) r.checked = true; });
     }
 
     function getVal(name) {
@@ -252,7 +257,7 @@
     function updateTotal() {
         let total = 0;
         let answeredCount = 0;
-        let missingItems = [];
+        let missing = [];
 
         for (let i = 1; i <= 14; i++) {
             const val = getVal('q' + i);
@@ -260,42 +265,50 @@
                 total += val;
                 answeredCount++;
             } else {
-                missingItems.push(i);
+                missing.push(i);
             }
         }
 
         document.getElementById('total-score').innerText = total;
         const riskBadge = document.getElementById('risk-status');
-        const incompleteMsg = document.getElementById('incomplete-msg');
+        const warn = document.getElementById('incomplete-msg');
         
         if(answeredCount < 14) {
-            riskBadge.innerText = "Incomplete";
+            riskBadge.innerText = "Assessment Incomplete";
             riskBadge.style.backgroundColor = "#bdc3c7";
-            incompleteMsg.innerText = "Missing items: " + missingItems.join(", ");
+            warn.innerText = "Unanswered items: " + missing.join(", ");
         } else {
-            incompleteMsg.innerText = "";
+            warn.innerText = "";
             if (total >= 41) {
-                riskBadge.innerText = "Low Fall Risk";
+                riskBadge.innerText = "Low Fall Risk (41-56)";
                 riskBadge.style.backgroundColor = "var(--risk-low)";
             } else if (total >= 21) {
-                riskBadge.innerText = "Medium Fall Risk";
+                riskBadge.innerText = "Medium Fall Risk (21-40)";
                 riskBadge.style.backgroundColor = "var(--risk-med)";
             } else {
-                riskBadge.innerText = "High Fall Risk";
+                riskBadge.innerText = "High Fall Risk (0-20)";
                 riskBadge.style.backgroundColor = "var(--risk-high)";
             }
         }
     }
 
     function resetCalculator() {
-        if(confirm("Reset all items?")) {
+        if(confirm("Are you sure you want to clear all scores?")) {
             document.getElementById('bbsForm').reset();
             applyClinicalLogic();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 
-    window.onload = buildForm;
+    // Force build on load and display error button if it fails
+    window.addEventListener('load', () => {
+        buildForm();
+        setTimeout(() => {
+            if (document.getElementById('questions-list').children.length <= 1) {
+                document.getElementById('load-error-btn').style.display = 'block';
+            }
+        }, 1000);
+    });
 </script>
 
 </body>
