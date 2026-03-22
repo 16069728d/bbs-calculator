@@ -25,11 +25,10 @@
 
         .calculator-card {
             max-width: 700px;
-            margin: 0 auto 200px auto; 
+            margin: 0 auto 220px auto; 
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            overflow: hidden;
         }
 
         .header {
@@ -47,13 +46,14 @@
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: #fff;
+            transition: all 0.2s ease;
         }
 
-        /* The Visual "Locked" State */
+        /* The "Locked" Visuals */
         .question-block.locked {
-            background-color: var(--locked-bg);
-            opacity: 0.6;
-            pointer-events: none; /* Prevents clicking */
+            background-color: var(--locked-bg) !important;
+            opacity: 0.5;
+            pointer-events: none; /* User cannot click anything inside */
         }
 
         .question-label {
@@ -61,7 +61,6 @@
             color: var(--ha-blue);
             display: block;
             margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
         }
 
         .options-list { display: flex; flex-direction: column; gap: 8px; }
@@ -76,8 +75,7 @@
             cursor: pointer;
         }
 
-        .option-item input { width: 20px; height: 20px; flex-shrink: 0; }
-        .score-badge { font-weight: bold; color: var(--ha-blue); }
+        .score-badge { font-weight: bold; color: var(--ha-blue); margin-right: 5px;}
 
         /* Sticky Footer */
         .results-footer {
@@ -87,11 +85,11 @@
             box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
             padding: 15px;
             text-align: center;
-            z-index: 999;
+            z-index: 1000;
             border-top: 4px solid var(--ha-blue);
         }
 
-        .score-display { font-size: 1.6rem; font-weight: bold; margin-bottom: 5px; }
+        .score-display { font-size: 1.8rem; font-weight: bold; margin-bottom: 5px; }
         
         .risk-badge {
             display: inline-block;
@@ -100,17 +98,17 @@
             color: white;
             font-weight: bold;
             background-color: #bdc3c7;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
-        .missing-alert { color: #d63031; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; }
+        .missing-txt { color: #d63031; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; min-height: 1em; }
 
         .btn-group { display: flex; gap: 10px; justify-content: center; }
 
         button {
-            padding: 10px 25px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
         }
@@ -130,141 +128,141 @@
         <form id="bbsForm">
             <div class="question-block" id="block-q1"><span class="question-label">1. Sitting to standing</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q1" value="4"> <span><span class="score-badge">4:</span> Independent</span></label>
-                    <label class="option-item"><input type="radio" name="q1" value="3"> <span><span class="score-badge">3:</span> Independent with hands</span></label>
-                    <label class="option-item"><input type="radio" name="q1" value="2"> <span><span class="score-badge">2:</span> Independent with several tries</span></label>
-                    <label class="option-item"><input type="radio" name="q1" value="1"> <span><span class="score-badge">1:</span> Needs minimal assist</span></label>
-                    <label class="option-item"><input type="radio" name="q1" value="0"> <span><span class="score-badge">0:</span> Needs mod/max assist</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> Independent</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> Independent with hands</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> Independent with several tries</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Needs minimal assist</span></label>
+                    <label class="option-item"><input type="radio" name="q1" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Needs mod/max assist</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q2"><span class="question-label">2. Standing unsupported (2 min)</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q2" value="4"> <span><span class="score-badge">4:</span> Safe 2 mins</span></label>
-                    <label class="option-item"><input type="radio" name="q2" value="3"> <span><span class="score-badge">3:</span> 2 mins with supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q2" value="2"> <span><span class="score-badge">2:</span> 30 secs unsupported</span></label>
-                    <label class="option-item"><input type="radio" name="q2" value="1"> <span><span class="score-badge">1:</span> Needs tries for 30 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q2" value="0"> <span><span class="score-badge">0:</span> Unable 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> Safe 2 mins</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> 2 mins with supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> 30 secs unsupported</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Needs tries for 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q2" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Unable 30 secs</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q3"><span class="question-label">3. Sitting back unsupported</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q3" value="4"> <span><span class="score-badge">4:</span> Safe 2 mins</span></label>
-                    <label class="option-item"><input type="radio" name="q3" value="3"> <span><span class="score-badge">3:</span> 2 mins supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q3" value="2"> <span><span class="score-badge">2:</span> 30 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q3" value="1"> <span><span class="score-badge">1:</span> 10 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q3" value="0"> <span><span class="score-badge">0:</span> Unable without support</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> Safe 2 mins</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> 2 mins supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> 10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q3" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Unable without support</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q4"><span class="question-label">4. Standing to sitting</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q4" value="4"> <span><span class="score-badge">4:</span> Sits safely</span></label>
-                    <label class="option-item"><input type="radio" name="q4" value="3"> <span><span class="score-badge">3:</span> Controls descent with hands</span></label>
-                    <label class="option-item"><input type="radio" name="q4" value="2"> <span><span class="score-badge">2:</span> Uses legs against chair</span></label>
-                    <label class="option-item"><input type="radio" name="q4" value="1"> <span><span class="score-badge">1:</span> Uncontrolled descent</span></label>
-                    <label class="option-item"><input type="radio" name="q4" value="0"> <span><span class="score-badge">0:</span> Needs assist</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> Sits safely</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> Controls descent with hands</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> Uses legs against chair</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Uncontrolled descent</span></label>
+                    <label class="option-item"><input type="radio" name="q4" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Needs assist</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q5"><span class="question-label">5. Transfers</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q5" value="4"> <span><span class="score-badge">4:</span> Safe with minor hands</span></label>
-                    <label class="option-item"><input type="radio" name="q5" value="3"> <span><span class="score-badge">3:</span> Safe definite hands</span></label>
-                    <label class="option-item"><input type="radio" name="q5" value="2"> <span><span class="score-badge">2:</span> Verbal cue/supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q5" value="1"> <span><span class="score-badge">1:</span> Needs 1 person assist</span></label>
-                    <label class="option-item"><input type="radio" name="q5" value="0"> <span><span class="score-badge">0:</span> Needs 2 people assist</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> Safe with minor hands</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> Safe definite hands</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> Verbal cue/supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Needs 1 person assist</span></label>
+                    <label class="option-item"><input type="radio" name="q5" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Needs 2 people assist</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q6"><span class="question-label">6. Standing eyes closed</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q6" value="4"> <span><span class="score-badge">4:</span> 10 secs safely</span></label>
-                    <label class="option-item"><input type="radio" name="q6" value="3"> <span><span class="score-badge">3:</span> 10 secs supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q6" value="2"> <span><span class="score-badge">2:</span> 3 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q6" value="1"> <span><span class="score-badge">1:</span> Unable 3s but safe</span></label>
-                    <label class="option-item"><input type="radio" name="q6" value="0"> <span><span class="score-badge">0:</span> Needs help to not fall</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> 10 secs safely</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> 10 secs supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> 3 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Unable 3s but safe</span></label>
+                    <label class="option-item"><input type="radio" name="q6" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Needs help to not fall</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q7"><span class="question-label">7. Standing feet together</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q7" value="4"> <span><span class="score-badge">4:</span> Independent 1 min</span></label>
-                    <label class="option-item"><input type="radio" name="q7" value="3"> <span><span class="score-badge">3:</span> Supervision 1 min</span></label>
-                    <label class="option-item"><input type="radio" name="q7" value="2"> <span><span class="score-badge">2:</span> Independent < 30 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q7" value="1"> <span><span class="score-badge">1:</span> Needs help to position</span></label>
-                    <label class="option-item"><input type="radio" name="q7" value="0"> <span><span class="score-badge">0:</span> Needs help and unable 15s</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> Independent 1 min</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> Supervision 1 min</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> Independent < 30 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Needs help to position</span></label>
+                    <label class="option-item"><input type="radio" name="q7" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Needs help and unable 15s</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q8"><span class="question-label">8. Reaching forward</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q8" value="4"> <span><span class="score-badge">4:</span> > 25 cm</span></label>
-                    <label class="option-item"><input type="radio" name="q8" value="3"> <span><span class="score-badge">3:</span> > 12.5 cm</span></label>
-                    <label class="option-item"><input type="radio" name="q8" value="2"> <span><span class="score-badge">2:</span> > 5 cm</span></label>
-                    <label class="option-item"><input type="radio" name="q8" value="1"> <span><span class="score-badge">1:</span> Supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q8" value="0"> <span><span class="score-badge">0:</span> Loses balance</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> > 25 cm</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> > 12.5 cm</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> > 5 cm</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q8" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Loses balance</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q9"><span class="question-label">9. Pick up from floor</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q9" value="4"> <span><span class="score-badge">4:</span> Easy/Safe</span></label>
-                    <label class="option-item"><input type="radio" name="q9" value="3"> <span><span class="score-badge">3:</span> Supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q9" value="2"> <span><span class="score-badge">2:</span> Reaches 2-5cm from floor</span></label>
-                    <label class="option-item"><input type="radio" name="q9" value="1"> <span><span class="score-badge">1:</span> Supervision while trying</span></label>
-                    <label class="option-item"><input type="radio" name="q9" value="0"> <span><span class="score-badge">0:</span> Unable/Needs assist</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> Easy/Safe</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> Supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> Reaches 2-5cm from floor</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Supervision while trying</span></label>
+                    <label class="option-item"><input type="radio" name="q9" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Unable/Needs assist</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q10"><span class="question-label">10. Turning to look behind</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q10" value="4"> <span><span class="score-badge">4:</span> Looks both sides well</span></label>
-                    <label class="option-item"><input type="radio" name="q10" value="3"> <span><span class="score-badge">3:</span> One side only</span></label>
-                    <label class="option-item"><input type="radio" name="q10" value="2"> <span><span class="score-badge">2:</span> Sideways only</span></label>
-                    <label class="option-item"><input type="radio" name="q10" value="1"> <span><span class="score-badge">1:</span> Supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q10" value="0"> <span><span class="score-badge">0:</span> Needs assist</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> Looks both sides well</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> One side only</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> Sideways only</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q10" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Needs assist</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q11"><span class="question-label">11. Turn 360 degrees</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q11" value="4"> <span><span class="score-badge">4:</span> < 4 secs safely</span></label>
-                    <label class="option-item"><input type="radio" name="q11" value="3"> <span><span class="score-badge">3:</span> < 4 secs one side only</span></label>
-                    <label class="option-item"><input type="radio" name="q11" value="2"> <span><span class="score-badge">2:</span> Safe but slow</span></label>
-                    <label class="option-item"><input type="radio" name="q11" value="1"> <span><span class="score-badge">1:</span> Close supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q11" value="0"> <span><span class="score-badge">0:</span> Needs assist</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> < 4 secs safely</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> < 4 secs one side only</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> Safe but slow</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Close supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q11" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Needs assist</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q12"><span class="question-label">12. Stool stepping</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q12" value="4"> <span><span class="score-badge">4:</span> 8 steps in 20s</span></label>
-                    <label class="option-item"><input type="radio" name="q12" value="3"> <span><span class="score-badge">3:</span> 8 steps in > 20s</span></label>
-                    <label class="option-item"><input type="radio" name="q12" value="2"> <span><span class="score-badge">2:</span> 4 steps supervision</span></label>
-                    <label class="option-item"><input type="radio" name="q12" value="1"> <span><span class="score-badge">1:</span> > 2 steps minimal assist</span></label>
-                    <label class="option-item"><input type="radio" name="q12" value="0"> <span><span class="score-badge">0:</span> Needs assist</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> 8 steps in 20s</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> 8 steps in > 20s</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> 4 steps supervision</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> > 2 steps minimal assist</span></label>
+                    <label class="option-item"><input type="radio" name="q12" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Needs assist</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q13"><span class="question-label">13. Tandem standing</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q13" value="4"> <span><span class="score-badge">4:</span> 30 secs tandem</span></label>
-                    <label class="option-item"><input type="radio" name="q13" value="3"> <span><span class="score-badge">3:</span> 30 secs foot ahead</span></label>
-                    <label class="option-item"><input type="radio" name="q13" value="2"> <span><span class="score-badge">2:</span> 30 secs small step</span></label>
-                    <label class="option-item"><input type="radio" name="q13" value="1"> <span><span class="score-badge">1:</span> Needs help for 15s</span></label>
-                    <label class="option-item"><input type="radio" name="q13" value="0"> <span><span class="score-badge">0:</span> Loses balance</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> 30 secs tandem</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> 30 secs foot ahead</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> 30 secs small step</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Needs help for 15s</span></label>
+                    <label class="option-item"><input type="radio" name="q13" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Loses balance</span></label>
                 </div>
             </div>
 
             <div class="question-block" id="block-q14"><span class="question-label">14. Stand one leg</span>
                 <div class="options-list">
-                    <label class="option-item"><input type="radio" name="q14" value="4"> <span><span class="score-badge">4:</span> > 10 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q14" value="3"> <span><span class="score-badge">3:</span> 5-10 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q14" value="2"> <span><span class="score-badge">2:</span> >= 3 secs</span></label>
-                    <label class="option-item"><input type="radio" name="q14" value="1"> <span><span class="score-badge">1:</span> Unable 3s but independent</span></label>
-                    <label class="option-item"><input type="radio" name="q14" value="0"> <span><span class="score-badge">0:</span> Unable/Needs assist</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="4" onchange="runBBSLogic()"> <span><span class="score-badge">4:</span> > 10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="3" onchange="runBBSLogic()"> <span><span class="score-badge">3:</span> 5-10 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="2" onchange="runBBSLogic()"> <span><span class="score-badge">2:</span> >= 3 secs</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="1" onchange="runBBSLogic()"> <span><span class="score-badge">1:</span> Unable 3s but independent</span></label>
+                    <label class="option-item"><input type="radio" name="q14" value="0" onchange="runBBSLogic()"> <span><span class="score-badge">0:</span> Unable/Needs assist</span></label>
                 </div>
             </div>
         </form>
@@ -273,54 +271,48 @@
 
 <div class="results-footer">
     <div class="score-display">Total: <span id="total-val">0</span> / 56</div>
-    <div id="risk-txt" class="risk-badge">Awaiting Data</div>
-    <div id="missing-txt" class="missing-alert"></div>
+    <div id="risk-txt" class="risk-badge">Assessment Incomplete</div>
+    <div id="missing-txt" class="missing-txt"></div>
     <div class="btn-group">
-        <button class="btn-reset" onclick="hardReset()">Reset All</button>
+        <button class="btn-reset" onclick="manualReset()">Reset Form</button>
         <button class="btn-home" onclick="window.location.href='https://16069728d.github.io/E-doc-outcomes-calculators/'">Home</button>
     </div>
 </div>
 
 <script>
-    const form = document.getElementById('bbsForm');
-
-    // Add event listeners to all radios
-    form.addEventListener('change', () => {
-        applyClinicalRules();
-        calculateResult();
-    });
-
-    function applyClinicalRules() {
-        const q2 = getVal('q2');
+    function runBBSLogic() {
+        const q2Val = getScore('q2');
         const block3 = document.getElementById('block-q3');
 
-        // Logic 1: Reset Q3 lock state every time logic runs
+        // Logic 1: Every time we click, we first unlock Q3 to avoid getting stuck
         block3.classList.remove('locked');
 
-        // Logic 2: Q2 = 4 -> Auto-select Q3(4) and LOCK
-        if (q2 === 4) {
+        // Logic 2: Q2 = 4 -> Set Q3 to 4 and LOCK IT
+        if (q2Val === 4) {
             setRadio('q3', 4);
             block3.classList.add('locked');
         }
 
-        // Logic 3: Q2 = 0 -> Auto-select Q6-14 (0) but NO LOCK
-        if (q2 === 0) {
+        // Logic 3: Q2 = 0 -> Set Q6 thru Q14 to 0 (No lock)
+        if (q2Val === 0) {
             for (let i = 6; i <= 14; i++) {
                 setRadio('q' + i, 0);
             }
         }
+
+        updateTotals();
     }
 
-    function calculateResult() {
+    function updateTotals() {
         let total = 0;
-        let answered = 0;
+        let count = 0;
         let missing = [];
 
         for (let i = 1; i <= 14; i++) {
-            const val = getVal('q' + i);
-            if (val !== null) {
-                total += val;
-                answered++;
+            const v = getScore('q' + i);
+            if (v !== null) {
+                total += v;
+                count++;
             } else {
                 missing.push(i);
             }
@@ -330,10 +322,10 @@
         const risk = document.getElementById('risk-txt');
         const alert = document.getElementById('missing-txt');
 
-        if (answered < 14) {
+        if (count < 14) {
             risk.innerText = "Incomplete";
             risk.style.backgroundColor = "#bdc3c7";
-            alert.innerText = "Missing items: " + missing.join(", ");
+            alert.innerText = "Missing: " + missing.join(", ");
         } else {
             alert.innerText = "";
             if (total >= 41) {
@@ -349,29 +341,31 @@
         }
     }
 
-    // Helpers
-    function getVal(name) {
+    // Helper: Get checked radio value
+    function getScore(name) {
         const el = document.querySelector(input[name="${name}"]:checked);
         return el ? parseInt(el.value) : null;
     }
 
+    // Helper: Set a radio to a specific value
     function setRadio(name, val) {
         const radios = document.getElementsByName(name);
         radios.forEach(r => { if(parseInt(r.value) === val) r.checked = true; });
     }
 
-    function hardReset() {
-        if(confirm("Clear all data?")) {
-            form.reset();
-            // Remove locks manually
+    // Reset Function
+    function manualReset() {
+        if(confirm("This will clear all scores. Continue?")) {
+            document.getElementById('bbsForm').reset();
+            // Manually remove any locks
             document.querySelectorAll('.question-block').forEach(b => b.classList.remove('locked'));
-            calculateResult();
+            updateTotals();
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
     }
 
-    // Initialize display on load
-    window.onload = calculateResult;
+    // Run once on load to start at 0
+    window.onload = updateTotals;
 </script>
 
 </body>
