@@ -25,7 +25,7 @@
 
         .calculator-card {
             max-width: 700px;
-            margin: 0 auto 200px auto; 
+            margin: 0 auto 230px auto; /* Slightly increased bottom margin for the footer */
             background: white;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
@@ -103,6 +103,15 @@
             font-weight: bold;
             background-color: #bdc3c7;
             margin-bottom: 8px;
+        }
+
+        /* New styling for the mobility interpretation */
+        .mobility-txt {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--ha-blue);
+            margin-bottom: 10px;
+            min-height: 1.2em;
         }
 
         .missing-txt { color: #d63031; font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; min-height: 1.2em; }
@@ -291,6 +300,10 @@
 <div class="results-footer">
     <div class="score-display">Total: <span id="total-val">0</span> / 56</div>
     <div id="risk-txt" class="risk-badge">Assessment Incomplete</div>
+    
+    <!-- New interpretation text area -->
+    <div id="mobility-txt" class="mobility-txt"></div>
+    
     <div id="missing-txt" class="missing-txt"></div>
     <div class="btn-group">
         <button class="btn-reset" onclick="resetApp()">Reset Form</button>
@@ -354,22 +367,29 @@
         document.getElementById('total-val').innerText = total;
         const riskBadge = document.getElementById('risk-txt');
         const missingWarning = document.getElementById('missing-txt');
+        const mobilityTxt = document.getElementById('mobility-txt'); // New element selection
 
         if (answeredCount < 14) {
             riskBadge.innerText = "Assessment Incomplete";
             riskBadge.style.backgroundColor = "#bdc3c7"; // Gray
             missingWarning.innerText = "Missing items: " + missingItems.join(", ");
+            mobilityTxt.innerText = ""; // Clear interpretation if incomplete
         } else {
             missingWarning.innerText = ""; // Clear warning
+            
+            // Adding the new mobility interpretation logic alongside the risk badges
             if (total >= 41) {
                 riskBadge.innerText = "Low Fall Risk (41-56)";
                 riskBadge.style.backgroundColor = "var(--risk-low)";
+                mobilityTxt.innerText = "Interpretation: Walking independently";
             } else if (total >= 21) {
                 riskBadge.innerText = "Medium Fall Risk (21-40)";
                 riskBadge.style.backgroundColor = "var(--risk-med)";
+                mobilityTxt.innerText = "Interpretation: Walking with assistance";
             } else {
                 riskBadge.innerText = "High Fall Risk (0-20)";
                 riskBadge.style.backgroundColor = "var(--risk-high)";
+                mobilityTxt.innerText = "Interpretation: Mobility by wheelchair";
             }
         }
     }
